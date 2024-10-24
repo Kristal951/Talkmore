@@ -1,0 +1,14 @@
+/* str-chat messaging light str-chat__channel-list str-chat__channel-list-react */
+
+.str-chat{
+    width: 100%;
+    margin: 0;
+    height: 100%;
+    /* background: #2563eb;    */
+}
+.chatContainer{
+    flex: 4;
+}
+.str-chat__message-input{
+    width: 96%;
+}
