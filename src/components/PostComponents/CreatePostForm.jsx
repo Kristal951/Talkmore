@@ -1,9 +1,9 @@
 import React, { useCallback, useState, useRef, useContext } from 'react';
 import { Button, Input, Textarea, useToast } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
-import UploadFile from '../assets/icons/file-upload.svg'; // Ensure this is an actual SVG file path.
-import { createPost } from '../lib/AppriteFunction';
-import { UserContext } from '../Contexts/UserContext';
+import UploadFile from '../../assets/icons/file-upload.svg'; // Ensure this is an actual SVG file path.
+import { createPost } from '../../lib/AppriteFunction';
+import { UserContext } from '../../Contexts/UserContext';
 
 const CreatePostForm = () => {
   const [postFile, setPostFile] = useState(null);

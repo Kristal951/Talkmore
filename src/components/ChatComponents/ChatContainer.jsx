@@ -2,10 +2,10 @@ import React from 'react';
 import ChannelInner from './ChannelInner';
 import CreateChannel from './CreateChannel';
 import EditChannel from './EditChannel';
-import EmptyChannelState from './EmptyChannelState';
+import EmptyChannelState from '../PostComponents/EmptyChannelState';
 import { Channel, useChatContext } from 'stream-chat-react';
 import { EmojiPicker } from 'stream-chat-react/emojis'
-import CustomMessageList from './CustomMessageList';
+import CustomMessageRenderer from './CustomMessageRenderer';
 
 const ChatContainer = ({ isCreating, setIsCreating, isEditing, setIsEditing, createType }) => {
 
@@ -30,7 +30,8 @@ const ChatContainer = ({ isCreating, setIsCreating, isEditing, setIsEditing, cre
             <Channel
                 EmptyStateIndicator={EmptyChannelState}
                 EmojiPicker={EmojiPicker}
-                // Message={(messageProps)=> <CustomMessageList {...messageProps}/>}
+                // Message={CustomMessageRenderer}
+                // Message={(messageProps)=> <CustomMessageRenderer {...messageProps}/>}
             >
                 <ChannelInner setIsEditing={setIsEditing} />
             </Channel>

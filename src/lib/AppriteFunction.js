@@ -1,4 +1,4 @@
-const { Client, Storage, Databases, ID } = require("appwrite");
+const { Client, Storage, Databases, ID, Query } = require("appwrite");
 const AppwriteClient = new Client();
 AppwriteClient
     .setEndpoint('https://cloud.appwrite.io/v1')
@@ -125,3 +125,64 @@ export const deletePost = async(post)=>{
         console.error('Error deleting file:', error);
     }
 }
+
+export  const getPostByID = async (postId) => {
+            try {
+                const post = await databases.getDocument(
+                    '6713a7c9001581fc5175',
+                    '6713ac4e0004c0f113e9', 
+                    postId                   
+                );
+                return post;  
+            } catch (error) {
+                console.log('Error fetching post:', error);
+                throw new Error('Unable to fetch post'); 
+            }
+        };
+
+export const getCommentsByPostID= async(postId)=>{
+    try {
+        const comments = databases.listDocuments(
+            '6713a7c9001581fc5175',
+            '671b4ada0035747f596d', 
+            [Query.equal("post", postId)]
+        )
+        return comments;
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        throw new Error('Unable to fetch comments');
+    }
+}
+
+export const addComment = async (payload) => {
+    try {
+        const {postId, userId, content} = payload
+        const newComment = await databases.createDocument(
+            '6713a7c9001581fc5175',
+            '671b4ada0035747f596d', 
+            ID.unique(), 
+            {
+                post: postId,
+                creator: userId,
+                content: content,
+            }
+        );
+        return newComment;
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        throw new Error('Unable to add comment');
+    }
+}
+export const getUserPosts = async (userId) => {
+    try {
+        const response = await databases.listDocuments(
+            '6713a7c9001581fc5175', 
+            '6713ac4e0004c0f113e9',
+            [Query.equal('creator', userId)] 
+        );
+        return response.documents; 
+    } catch (error) {
+        console.error('Error fetching user posts:', error);
+        throw new Error('Unable to fetch user posts');
+    }
+};

@@ -4,7 +4,7 @@ import UserList from './UserList';
 import { useChatContext } from 'stream-chat-react';
 import { useDropzone } from 'react-dropzone';
 import { MdFileUpload } from "react-icons/md";
-import { getFileUrl, uploadFile } from '../lib/AppriteFunction';
+import { getFileUrl, uploadFile } from '../../lib/AppriteFunction';
 
 const CreateChannel = ({ createType, setIsCreating }) => {
     const { client, setActiveChannel } = useChatContext(); // Destructure setActiveChannel from useChatContext

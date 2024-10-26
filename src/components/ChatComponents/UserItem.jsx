@@ -1,6 +1,6 @@
 import { Wrap, WrapItem, Avatar, AvatarBadge } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { InviteIcon } from '../assets/icons/InviteIcon'
+import { InviteIcon } from '../../assets/icons/InviteIcon'
 
 const UserItem = ({ user, selectedUser, setSelectedUser }) => {
     const [selected, setSelected] = useState(false)

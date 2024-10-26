@@ -76,7 +76,8 @@ const SignUpUser = async (req, res) => {
                 id: userId,
                 name: name,
                 email: email,
-                image: avatarURL
+                image: avatarURL,
+                tag: tag
             },
             userToken
         );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, useChatContext } from 'stream-chat-react';
 
-import { InviteIcon } from '../assets/icons/InviteIcon';
+import { InviteIcon } from '../../assets/icons/InviteIcon';
 import { Spinner, Wrap, WrapItem } from '@chakra-ui/react';
 import UserItem from './UserItem';
 

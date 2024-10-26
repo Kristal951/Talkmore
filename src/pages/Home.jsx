@@ -4,7 +4,7 @@ import { FaSearch } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { Button, Spinner } from '@chakra-ui/react';
 import axios from 'axios';
-import PostCard from '../components/PostCard';
+import PostCard from '../components/PostComponents/PostCard';
 
 const Home = () => {
     const { userDetails } = useContext(UserContext);
@@ -60,7 +60,7 @@ const Home = () => {
 
     return (
         <div className='w-full h-screen'>
-            <div className="w-full h-[60px] p-2 shadow-md z-[999] gap-6 bg-[#4b5563] bg-blend-saturation bg-opacity-10 left-[70px] flex fixed items-center flex-row top-0">
+            <div className="w-full h-[60px] p-2 shadow-md z-[999] gap-6 bg-[#4b5563] bg-opacity-10 backdrop-blur-lg border-[1px] border-[rgba(255,255,255,0.18)] left-[70px] flex fixed items-center flex-row top-0">
                 <div className="flex w-[150px] h-[80%] border-[1px] border-black"></div>
                 <div className="flex right-40 items-center justify-center absolute">
                     <Button colorScheme='blue' variant='solid' onClick={() => navigate('/CreatePost')}>
@@ -108,7 +108,7 @@ const Home = () => {
                         <Button colorScheme='blue' onClick={() => navigate('/CreatePost')}>Create A Post</Button>
                     </div>
                 )}
-                <div className="flex w-full overflow-y-scroll items-center pt-16 flex-col">
+                <div className="flex w-full overflow-y-scroll gap-10 items-center pt-16 flex-col">
                     {!loading && posts.length > 0 && Array.isArray(posts) && posts.map((post) => (
                         <PostCard key={post.$id} post={post} />
                     ))}

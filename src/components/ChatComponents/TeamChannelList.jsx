@@ -1,6 +1,7 @@
 import React from 'react';
 import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from '@chakra-ui/react';
 import AddChannelIcon from './AddChannelIcon';
+import './index.css'
 
 const TeamChannelList = ({ children, error, loading, type, isCreating, setCreateType, setIsCreating, setIsEditing, setToggleContainer }) => {
     // Render error state
@@ -43,7 +44,7 @@ const TeamChannelList = ({ children, error, loading, type, isCreating, setCreate
                             </div>
                             <AccordionIcon />
                         </AccordionButton>
-                        <AccordionPanel columnGap={4} overflowY="scroll" className="flex flex-col w-full h-full gap-4">
+                        <AccordionPanel columnGap={4} overflowY="scroll" height="100%" className="flex flex-col w-full h-full gap-4">
                             {/* <div className="w-full h-ful overflow-y-scroll"> */}
                                 {children}
                             {/* </div> */}

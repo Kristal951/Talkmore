@@ -4,6 +4,8 @@ import MessagingHeader from './MessagingHeader';
 import { RiGroup2Fill } from 'react-icons/ri';
 import { FaUserCircle } from "react-icons/fa";
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
+import { FaVideo } from "react-icons/fa6";
+import { IoCall } from "react-icons/io5";
 
 const TeamChannelHeader = ({ setIsEditing }) => {
     const { channel, watcher_count } = useChannelStateContext();
@@ -65,16 +67,33 @@ const TeamChannelHeader = ({ setIsEditing }) => {
                         </h3>
                     </div>
                 )}
+                <div className={ channel.type === 'team' ? "flex w-max h-max absolute right-28" : "flex w-max h-max absolute right-4"}>
+                    <div className="flex w-[40px] h-[40px] rounded-full p-2 hover:bg-gray-400 hover:bg-opacity-20 cursor-pointer">
+                        <FaVideo 
+                            className='w-full h-full'
+                        />
+                    </div>
+                    <div className="flex w-[40px] h-[40px] rounded-full p-2 hover:bg-gray-400 hover:bg-opacity-20 cursor-pointer">
+                        <IoCall 
+                            className='w-full h-full'
+                        />
+                    </div>
+
+                </div>
             </div>
+           {/* style={{justifySelf: 'flex-end'}}} */}
 
             {/* MessagingHeader component for additional controls or actions */}
             <MessagingHeader setIsEditing={setIsEditing} />
-
-            <div className='absolute right-2'>
-                <p className='team-channel-header__right-text'>
-                    {getWatcherText(watcher_count)}
-                </p>
-            </div>
+            {
+                channel.type === 'team' &&(
+                    <div className='absolute right-2'>
+                        <p className='team-channel-header__right-text'>
+                            {getWatcherText(watcher_count)}
+                        </p>
+                    </div>
+                )
+            }
         </div>
     );
 };
