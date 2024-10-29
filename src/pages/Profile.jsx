@@ -5,6 +5,7 @@ import { getUserPosts } from '../lib/AppriteFunction';
 import UserPostCard from '../components/PostComponents/UserPostCard';
 import useUserStatus from '../hooks/useUserStatus';
 import { useParams } from 'react-router-dom';
+import './index.css'
 
 const Profile = () => {
     const { userID } = useParams();
@@ -35,7 +36,6 @@ const Profile = () => {
                 setLoading(true)
                 const response = await client.queryUsers({ id: { $eq: userID } }, { limit: 1 });
                 setStreamUser(response.users[0]);
-                console.log(streamUser);
             } catch (error) {
                 setLoading(false)
                 console.error('Error fetching Stream user:', error);
@@ -77,7 +77,7 @@ const Profile = () => {
                 </div>
             }
 
-            <div className="w-full h-full p-6">
+            <div className="w-full h-full p-2">
                 <Tabs isFitted variant='enclosed'>
                     <TabList mb='1em'>
                         <Tab><p className='font-bold text-xl' title='user posts'>Posts</p></Tab>
@@ -85,7 +85,7 @@ const Profile = () => {
                     </TabList>
                     <TabPanels>
                         <TabPanel>
-                            <div className="flex flex-row h-max w-full gap-8 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray scrollbar-track-gray scrollbar-rounded">
+                            <div className="flex flex-wrap flex-row h-[500px] w-full p-2 gap-4 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray scrollbar-track-gray scrollbar-rounded">
                                 {userPosts.length > 0 ? (
                                     userPosts.map((post, i) => (
                                         <UserPostCard post={post} key={i} />

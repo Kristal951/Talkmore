@@ -9,20 +9,36 @@ const databases = new Databases(AppwriteClient);
 
 export const uploadFile = async (file) => {
     try {
+       
+        const maxSize = 50 * 1024 * 1024; 
+        if (file.size > maxSize) {
+            throw new Error('File size exceeds the maximum limit of 50 MB.');
+        }
+
+        // Optional: Check MIME type
+        // const allowedTypes = ['video/mp4', 'video/x-matroska']; // Add more types as needed
+        // if (!allowedTypes.includes(file.type)) {
+        //     throw new Error('Unsupported file type. Please upload a valid video file.');
+        // }
+
         const uploadedFile = await storage.createFile(
             '671116b10025310bdc15', 
             ID.unique(), 
             file
         );
+
         if (!uploadedFile) {
-            return 'File not uploaded';
+            throw new Error('Error creating post.');
         }
+
+        console.log("Uploaded file details:", uploadedFile); // Log uploaded file details
         return uploadedFile; 
     } catch (error) {
-        console.error('File upload error:', error);
+        console.error('File upload error:', error.message || error);
         throw error; 
     }
 };
+
 
 const deleteFileUrl = async (fileId) => {
     try {
@@ -39,18 +55,19 @@ const deleteFileUrl = async (fileId) => {
 
 export const getFileUrl = async (fileId) => {
     try {
-        const fileUrl = await storage.getFilePreview(
+        const fileUrl = await storage.getFileView(
             '671116b10025310bdc15', 
             fileId,
-            2000,
-            2000,
-            "top",
-            100
         );
         if (!fileUrl) {
             await deleteFileUrl(fileId);
             throw new Error('File URL not available');
         }
+        // 2000,
+        //     2000,
+        //     "top",
+        //     100
+        console.log(fileUrl);
         return fileUrl.href;
     } catch (error) {
         console.error('Error getting file URL:', error);
@@ -65,8 +82,9 @@ export const createPost = async (post) => {
         }
 
         const uploadedFile = await uploadFile(post.file);
-
+    
         const fileUrl = await getFileUrl(uploadedFile.$id); 
+        console.log(uploadedFile.$id);
 
         const fileType = post.file.type;
 

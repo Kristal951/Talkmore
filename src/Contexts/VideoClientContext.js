@@ -16,22 +16,29 @@ export const VideoClientProvider = ({ children }) => {
             setError('User details or user ID is missing');
             return;
         }
+        setIsClientReady(false);
 
         try {
             const apiKey = 'zd7jh347dvtn';
-            const userID = userDetails.$id
+            const userId = userDetails.$id;
 
-            // Fetch token for Stream Video
-            const { data: { token } } = await axios.post('http://localhost:5000/stream/token', { userID });
+            const tokenResponse = await axios.post('http://localhost:5000/stream/token', { userId });
+            const token = tokenResponse.data.token;
+            console.log(token);
 
-            const client = new StreamVideoClient({ apiKey, token, user: { id: userID } });
-            await client.connectUser({ apiKey, id: userID }, token);
+            const client = StreamVideoClient.getOrCreateInstance({
+                apiKey,
+                token,
+                user: { id: userId }
+            });
+
+            await client.connectUser({ apiKey, id: userId }, token);
 
             setVideoClient(client);
             setIsClientReady(true);
         } catch (err) {
             console.error('Error initializing video client:', err);
-            setError(err.message);
+            setError('Failed to initialize video client. Please try again later.');
         }
     };
 

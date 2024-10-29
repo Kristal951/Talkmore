@@ -6,14 +6,17 @@ import { FaUserCircle } from "react-icons/fa";
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import { FaVideo } from "react-icons/fa6";
 import { IoCall } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
 
 const TeamChannelHeader = ({ setIsEditing }) => {
     const { channel, watcher_count } = useChannelStateContext();
     const { client } = useChatContext();
+    const navigate = useNavigate()
 
     const TeamchannelImage = channel?.data?.image;
     const TeamchannelName = channel?.data?.name || 'Unnamed Channel';
     const members = Object.values(channel.state.members).filter(({user}) => user.id !== client.userID);
+    const videoCallMembers = Object.values(channel.state.members).filter(({user}) => user.id !== client.userID)
     const additionalMembers = members.length > 2 ? members.length - 2 : 0;
 
     const getWatcherText = (watchers) => {
@@ -21,6 +24,11 @@ const TeamChannelHeader = ({ setIsEditing }) => {
         if (watchers === 1) return '1 user online';
         return `${watchers} users online`;
     };
+
+    const navigateToVideoCallScreen=()=>{
+        const callID = channel.id
+        navigate(`/VideoCall/${callID}`, { state: { videoCallMembers } })
+    }
 
     return (
         <div className='h-[70px] w-full items-center flex-row relative shadow-md z-50 flex justify-start'>
@@ -71,6 +79,7 @@ const TeamChannelHeader = ({ setIsEditing }) => {
                     <div className="flex w-[40px] h-[40px] rounded-full p-2 hover:bg-gray-400 hover:bg-opacity-20 cursor-pointer">
                         <FaVideo 
                             className='w-full h-full'
+                            onClick={navigateToVideoCallScreen}
                         />
                     </div>
                     <div className="flex w-[40px] h-[40px] rounded-full p-2 hover:bg-gray-400 hover:bg-opacity-20 cursor-pointer">
@@ -81,9 +90,7 @@ const TeamChannelHeader = ({ setIsEditing }) => {
 
                 </div>
             </div>
-           {/* style={{justifySelf: 'flex-end'}}} */}
 
-            {/* MessagingHeader component for additional controls or actions */}
             <MessagingHeader setIsEditing={setIsEditing} />
             {
                 channel.type === 'team' &&(

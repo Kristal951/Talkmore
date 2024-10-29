@@ -110,7 +110,7 @@ const PostCard = ({ post }) => {
           ) : (
             <video
               controls
-              className="w-full h-[450px] z-10 object-cover rounded-md"
+              className="w-full h-[430px] z-10 object-cover rounded-md"
             >
               <source src={post.vidURL} type="video/mp4" />
               Your browser does not support the video tag.

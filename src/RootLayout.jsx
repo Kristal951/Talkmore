@@ -2,15 +2,14 @@ import React, { useContext, useEffect, } from 'react';
 import Sidebar from './components/Sidebar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { UserContext } from './Contexts/UserContext';
-import { ChatClientProvider, useChatClientContext } from './Contexts/ClientContext'; 
+import {useChatClientContext } from './Contexts/ClientContext'; 
 import { Chat } from 'stream-chat-react';
-import { Spinner, useToast } from '@chakra-ui/react';
+import { Spinner} from '@chakra-ui/react';
 
 const RootLayout = () => {
     const { setUserDetails } = useContext(UserContext);
     const navigate = useNavigate();
     const { chatClient, isClientReady, error } = useChatClientContext();
-    const toast = useToast()
 
     useEffect(() => {
         const payload = localStorage.getItem('appwritePayload');
@@ -36,7 +35,7 @@ const RootLayout = () => {
         if (error) {
             console.error('Chat client error:', error);
         }
-    }, [isClientReady, chatClient, error,navigate, setUserDetails]);
+    }, [isClientReady, chatClient, error, navigate, setUserDetails]);
 
     if (error) {
         return(
