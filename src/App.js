@@ -13,6 +13,8 @@ import PostComments from './components/PostComponents/PostComments'
 import Profile from './pages/Profile'
 import { VideoClientProvider } from './Contexts/VideoClientContext'
 import VideoCallScreen from './pages/VideoCallScreen'
+import AudioCallScreen from './pages/AudioCallScreen'
+import ChannelInfo from './components/ChatComponents/ChannelInfo'
 
 const App = () => {
   return (
@@ -33,6 +35,8 @@ const App = () => {
                   <Route path="/post/:postId/comments" element={<PostComments />} />
                   <Route path="/profile/:userID" element={<Profile/>} />
                   <Route path="/VideoCall/:callID" element={<VideoCallScreen/>} />
+                  <Route path="/AudioCall/:callID" element={<AudioCallScreen/>} />
+                  <Route path="/Chat/:channelID/Info" element={<ChannelInfo/>} />
                 </Route>
               </Routes>
             </Router>

@@ -204,3 +204,47 @@ export const getUserPosts = async (userId) => {
         throw new Error('Unable to fetch user posts');
     }
 };
+export const toggleLikePost = async (postId, userId) => {
+    try {
+      // Fetch the post
+      const response = await databases.listDocuments(
+        '6713a7c9001581fc5175', // Database ID
+        '6713ac4e0004c0f113e9', // Collection ID
+        [Query.equal('$id', postId)]
+      );
+  
+      // Ensure post exists
+      const post = response.documents[0];
+      if (!post) {
+        return 'Post not found';
+      }
+  
+      // Check if user has liked the post
+      const hasLiked = post.likes.includes(userId);
+  
+      // Toggle the like status
+      if (hasLiked) {
+        post.likes = post.likes.filter((id) => id !== userId);
+      } else {
+        post.likes.push(userId);
+      }
+  
+      await databases.updateDocument(
+        '6713a7c9001581fc5175', // Database ID
+        '6713ac4e0004c0f113e9', // Collection ID
+        postId, // Document ID
+        {
+          likes: post.likes,
+        }
+      );
+  
+      return {
+        isLiked: !hasLiked,
+        likeCount: post.likeCount,
+        message: hasLiked ? 'Post unliked' : 'Post liked',
+      };
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      return 'Internal server error';
+    }
+};

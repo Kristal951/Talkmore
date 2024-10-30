@@ -10,6 +10,7 @@ export const UserProvider = ({ children }) => {
     email: '',
     phoneNumber: '',
     imgUrl: '',
+    BIO: ''
   });
 
   const value = {

@@ -34,6 +34,10 @@ const Home = () => {
         }
     };
 
+    const handleDelete = (postId) => {
+        setPosts((prevPosts) => prevPosts.filter((post) => post.$id !== postId));
+    };
+
     useEffect(() => {
         const getAllPosts = async () => {
             try {
@@ -110,7 +114,7 @@ const Home = () => {
                 )}
                 <div className="flex w-full overflow-y-scroll gap-10 items-center pt-16 flex-col">
                     {!loading && posts.length > 0 && Array.isArray(posts) && posts.map((post) => (
-                        <PostCard key={post.$id} post={post} />
+                        <PostCard key={post.$id} post={post} onDelete={handleDelete}/>
                     ))}
                 </div>
  

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useChatContext } from 'stream-chat-react';
 import { AvatarBadge, Avatar, TabList, Tab, TabPanels, TabPanel, Tabs, Spinner } from '@chakra-ui/react';
 import { getUserPosts } from '../lib/AppriteFunction';
@@ -6,6 +6,7 @@ import UserPostCard from '../components/PostComponents/UserPostCard';
 import useUserStatus from '../hooks/useUserStatus';
 import { useParams } from 'react-router-dom';
 import './index.css'
+import { UserContext } from '../Contexts/UserContext';
 
 const Profile = () => {
     const { userID } = useParams();
@@ -13,6 +14,7 @@ const Profile = () => {
     const [streamUser, setStreamUser] = useState(null);
     const [loading, setLoading] = useState(false)
     const [userPosts, setUserPosts] = useState([]);
+    const { userDetails } = useContext(UserContext);
     const isOnline = useUserStatus(userID); // Use custom hook to check online status
 
     useEffect(() => {
@@ -76,6 +78,8 @@ const Profile = () => {
                     </div>
                 </div>
             }
+            
+            <p>{userDetails.BIO}</p>
 
             <div className="w-full h-full p-2">
                 <Tabs isFitted variant='enclosed'>

@@ -6,6 +6,9 @@ const useUserStatus = (userId) => {
     const [isOnline, setIsOnline] = useState(false);
 
     useEffect(() => {
+        if (!userId) return;
+
+        // Check the user's initial online status
         const fetchUserStatus = async () => {
             try {
                 const response = await client.queryUsers({ id: { $eq: userId } });
@@ -13,12 +16,13 @@ const useUserStatus = (userId) => {
                     setIsOnline(response.users[0].online);
                 }
             } catch (error) {
-                console.error("Error fetching user status:", error);
+                console.error(error);
             }
         };
 
         fetchUserStatus();
 
+        // Event listener for changes in user presence
         const handleUserStatusChange = (event) => {
             if (event.user.id === userId) {
                 setIsOnline(event.user.online);
@@ -27,6 +31,7 @@ const useUserStatus = (userId) => {
 
         client.on('user.presence.changed', handleUserStatusChange);
 
+        // Clean up the event listener on component unmount
         return () => {
             client.off('user.presence.changed', handleUserStatusChange);
         };

@@ -6,13 +6,11 @@ import { StreamCall } from '@stream-io/video-react-sdk';
 import CustomVideoCallUI from '../components/VideoCallComponents/CustomVideoCallUI';
 import IncomingCallUI from '../components/VideoCallComponents/IncomingCallUI';
 
-const VideoCallScreen = () => {
+const AudioCallScreen = () => {
   const { videoClient, isClientReady, error } = useVideoClientContext();
   const { callID } = useParams();
   const { state } = useLocation();
-  const memberstate = state?.videoCallMembers || [];
-  const channelType = state.channelType
-  const members = memberstate.map((member)=> member)
+  const members = state?.members || [];
   const navigate = useNavigate();
 
   const [call, setCall] = useState(null);
@@ -24,13 +22,12 @@ const VideoCallScreen = () => {
     const initializeCall = async () => {
       if (isClientReady && videoClient) {
         try {
-          const callType = 'default';
+          const callType = 'audio_room';
           const newCall = videoClient.call(callType, callID);
 
           await newCall.getOrCreate({
             ring: true,
-            data: { members: members},
-            role: 'user'
+            data: { members: members },
           });
           setCall(newCall);
         } catch (err) {
@@ -96,4 +93,4 @@ const VideoCallScreen = () => {
   );
 };
 
-export default VideoCallScreen;
+export default AudioCallScreen;

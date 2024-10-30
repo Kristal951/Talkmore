@@ -6,7 +6,8 @@ import { FaUserCircle } from "react-icons/fa";
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import { FaVideo } from "react-icons/fa6";
 import { IoCall } from "react-icons/io5";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaInfoCircle } from "react-icons/fa";
 
 const TeamChannelHeader = ({ setIsEditing }) => {
     const { channel, watcher_count } = useChannelStateContext();
@@ -18,6 +19,7 @@ const TeamChannelHeader = ({ setIsEditing }) => {
     const members = Object.values(channel.state.members).filter(({user}) => user.id !== client.userID);
     const videoCallMembers = Object.values(channel.state.members).filter(({user}) => user.id !== client.userID)
     const additionalMembers = members.length > 2 ? members.length - 2 : 0;
+    const channelType = channel.type
 
     const getWatcherText = (watchers) => {
         if (!watchers) return 'No users online';
@@ -27,14 +29,22 @@ const TeamChannelHeader = ({ setIsEditing }) => {
 
     const navigateToVideoCallScreen=()=>{
         const callID = channel.id
-        navigate(`/VideoCall/${callID}`, { state: { videoCallMembers } })
+        navigate(`/VideoCall/${callID}`, { state: { videoCallMembers , channelType } })
+    }
+    const navigateToAudioCallScreen=()=>{
+        const callID = channel.id
+        navigate(`/AudioCall/${callID}`, { state: { videoCallMembers, channelType } })
+    }
+    const navigateToChannelInfoScreen=()=>{
+        const channelID = channel.id
+        navigate(`/Chat/${channelID}/Info`)
     }
 
     return (
         <div className='h-[70px] w-full items-center flex-row relative shadow-md z-50 flex justify-start'>
             <div className="flex flex-row h-max w-max justify-start items-center text-blue-600">
                 {channel.type === 'team' ? (
-                    <div className="flex flex-row items-center">
+                    <div className="flex flex-row items-center p-2">
                         {TeamchannelImage ? (
                             <img 
                               src={TeamchannelImage} 
@@ -47,11 +57,16 @@ const TeamChannelHeader = ({ setIsEditing }) => {
                         <h3 className="ml-2 text-blue-600 text-xl">
                             {TeamchannelName}
                         </h3>
-                        {additionalMembers > 0 && (
+                        <div className="flex h-full w-max ml-2 items-center justify-center">
+                            <FaInfoCircle
+                                onClick={navigateToChannelInfoScreen}
+                            />
+                        </div>
+                        {/* {additionalMembers > 0 && (
                             <p className='ml-2 text-sm text-gray-600'>
                                 + {additionalMembers} more
                             </p>
-                        )}
+                        )} */}
                     </div>
                 ) : (
                   <div className="flex flex-row items-center">
@@ -85,6 +100,7 @@ const TeamChannelHeader = ({ setIsEditing }) => {
                     <div className="flex w-[40px] h-[40px] rounded-full p-2 hover:bg-gray-400 hover:bg-opacity-20 cursor-pointer">
                         <IoCall 
                             className='w-full h-full'
+                            onClick={navigateToAudioCallScreen}
                         />
                     </div>
 

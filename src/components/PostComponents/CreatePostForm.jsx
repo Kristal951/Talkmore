@@ -93,12 +93,11 @@ const CreatePostForm = () => {
           <div {...getRootProps()} className='w-full h-[350px] flex flex-col items-center'>
             <input {...getInputProps()} />
             <div className='w-full h-full rounded-md flex items-center flex-col justify-center border-[1px]'>
-              { !imagePreview && <p className='font-bold text-xl mb-4 p-4'>Post File</p>}
-
-              <div className="w-full h-[80%] flex flex-col justify-center items-center rounded-lg mb-2">
                 {imagePreview ? (
                   fileType === 'image' ? (
+                  <div className="w-full h-[80%] flex flex-col justify-center items-center rounded-lg">
                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
                   ) : (
                     <video controls className="w-full h-full">
                       <source src={imagePreview} type="video/mp4" />
@@ -106,10 +105,12 @@ const CreatePostForm = () => {
                     </video>
                   )
                 ) : (
-                  <img src={UploadFile} alt="Upload" className='w-[100px] h-[100px]' />
+                  <div className="flex flex-col w-full justify-center gap-6 items-center h-[80%]">
+                    <p className='font-bold text-xl p-2'>Post File</p>
+                    <img src={UploadFile} alt="Upload" className='w-[100px] h-[100px]' />
+                    <p>Drag and drop an image or video, or click below to select one</p>
+                  </div>
                 )}
-                {!imagePreview && <p>Drag and drop an image or video, or click below to select one</p>}
-              </div>
 
               <Button colorScheme='blue' width="50%" variant='solid'>
                 Select from computer
@@ -117,14 +118,17 @@ const CreatePostForm = () => {
             </div>
           </div>
 
-          <div className="absolute bottom-2 gap-3 flex flex-col w-full h-max">
+          <div className="gap-3 flex flex-col w-full h-max">
             <Input variant="filled" placeholder='Tags' value={tags} onChange={(e)=> setTags(e.target.value)}/>
             <Input variant="filled" placeholder='Location'value={location} onChange={(e)=> setLocation(e.target.value)} />
           </div>
 
-          <div className="flex w-full h-max">
-            <input type='submit'/>
+          <div className="w-full flex items-center justify-center h-max">
+            <Button colorScheme='blue' width="50%" variant='solid'>
+              Create Post
+            </Button>
           </div>
+          
         </form>
       </div>
     </div>

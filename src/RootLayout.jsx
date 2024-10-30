@@ -23,6 +23,7 @@ const RootLayout = () => {
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 imgUrl: user.imgURL,
+                BIO: user.BIO
             });
         } else {
             navigate('/Login');

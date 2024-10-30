@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { ImPhoneHangUp } from "react-icons/im";
 import './index.css';
 import { useVideoClientContext } from '../../Contexts/VideoClientContext';
-import IncomingCallUI from './IncomingCallUI';
 
 const CustomCallControls = () => {
     const { useCallCallingState } = useCallStateHooks();
@@ -13,7 +12,7 @@ const CustomCallControls = () => {
     const call = useCall();
     const callingState = useCallCallingState();
     const navigate = useNavigate();
-    console.log(call.state);
+    console.log(callingState);
 
     const handleLeaveCall = async () => {
         try {

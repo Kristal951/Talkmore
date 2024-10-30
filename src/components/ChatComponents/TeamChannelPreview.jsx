@@ -55,6 +55,7 @@ const TeamChannelPreview = ({ channel, type }) => {
   );
 
   const DirectPreview = () => {
+    // console.log(members[0]?.user);
     return (
       <div className={`w-full flex flex-row items-center space-x-2 h-[60px] px-2 ${isActive ? 'text-blue-600 border-l-[2px] border-blue-600' : 'text-blue-600'}`}>
         {members[0]?.user?.image ? (
