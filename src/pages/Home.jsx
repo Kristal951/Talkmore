@@ -1,17 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../Contexts/UserContext';
 import { FaSearch } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Spinner } from '@chakra-ui/react';
 import axios from 'axios';
 import PostCard from '../components/PostComponents/PostCard';
+import './index.scss'
+import { IoMenuSharp } from "react-icons/io5";
+import LOGO from '../assets/images/comp2.png'
 
 const Home = () => {
-    const { userDetails } = useContext(UserContext);
+   
     const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const {userDetails} = useContext(UserContext)
 
     const getAllPosts = async () => {
         try {
@@ -64,24 +68,36 @@ const Home = () => {
 
     return (
         <div className='w-full h-screen'>
-            <div className="w-full h-[60px] p-2 shadow-md z-[999] gap-6 bg-[#4b5563] bg-opacity-10 backdrop-blur-lg border-[1px] border-[rgba(255,255,255,0.18)] left-[70px] flex fixed items-center flex-row top-0">
-                <div className="flex w-[150px] h-[80%] border-[1px] border-black"></div>
-                <div className="flex right-40 items-center justify-center absolute">
+
+            <div className="w-full h-[60px] p-2 shadow-md gap-6 bg-[#4b5563] bg-opacity-10 backdrop-blur-lg border-[1px] border-[rgba(255,255,255,0.18)] left-[70px] flex fixed items-center flex-row top-0 topbar">
+                {/* <div className="flex w-[300px] h-[100%] border-[1px] border-black logo-contianer"> */}
+                <Link to="/" className='h-full'>
+                    <img src={LOGO} alt="Logo" className='object-contain h-full'/>
+                </Link>
+                  
+                {/* </div> */}
+                
+                <div className="flex right-40 items-center justify-center absolute create-post-btn-1">
                     <Button colorScheme='blue' variant='solid' onClick={() => navigate('/CreatePost')}>
                         Create A Post
                     </Button>
                 </div>
-                <div className="flex w-2/5 gap-2 rounded-md bg-[#4b5563] p-2 relative left-16 flex-row bg-opacity-15 h-max justify-center items-center">
+                <div className="right-40 items-center justify-center absolute bg-blue-600 p-[5px] text-white rounded-md hidden create-post-btn">
+                    <button onClick={() => navigate('/CreatePost')}>
+                        Add Post
+                    </button>
+                </div>
+                <div className="flex w-2/5 gap-2 rounded-md bg-white shadow-md p-2 relative left-16 flex-row h-max justify-center items-center searchbar">
                     <div className="flex">
                         <FaSearch />
                     </div>
                     <input
                         type='search'
-                        className='w-full rounded-md p-[3px] border-0 focus:outline-none'
+                        className='w-full rounded-md bg-[#4b5563] bg-opacity-15 p-[5px] border-0 focus:outline-none'
                         placeholder='Search anything'
                     />
                 </div>
-                <div className="flex w-[50px] h-[50px] absolute right-20 cursor-pointer">
+                <div className="flex w-[50px] h-[50px] absolute right-20 cursor-pointer profile-img">
                     <img
                         src={userDetails?.imgUrl || '/default-profile.png'}
                         alt={userDetails ? `${userDetails.name}'s profile picture` : 'default profile pic'}
@@ -89,9 +105,9 @@ const Home = () => {
                         title={userDetails.name}
                     />
                 </div>
-            </div>
+            </div> 
 
-
+            
             <div className="w-full h-full flex flex-col items-center justify-center">
                 {error && (
                     <div className="flex flex-col items-center justify-center text-red-500">
@@ -112,7 +128,7 @@ const Home = () => {
                         <Button colorScheme='blue' onClick={() => navigate('/CreatePost')}>Create A Post</Button>
                     </div>
                 )}
-                <div className="flex w-full overflow-y-scroll gap-10 items-center pt-16 flex-col">
+                <div className="flex w-full overflow-y-scroll gap-10 items-center pt-16 flex-col post-card-container">
                     {!loading && posts.length > 0 && Array.isArray(posts) && posts.map((post) => (
                         <PostCard key={post.$id} post={post} onDelete={handleDelete}/>
                     ))}

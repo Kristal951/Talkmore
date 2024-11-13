@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { UserContext } from '../../Contexts/UserContext';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
+import './index.scss'
 
 const PostCommentCard = ({ comment }) => {
   const { userDetails } = useContext(UserContext);
@@ -30,7 +31,7 @@ const PostCommentCard = ({ comment }) => {
   };
 
   return (
-    <div className="flex flex-row pb-2 gap-2">
+    <div className="flex flex-row pb-2 gap-2 post-comment-card">
       <Link to={`/profile/${comment.creator.$id}`}>
         <img 
           src={imgURL} //Todo: add fallback image uri

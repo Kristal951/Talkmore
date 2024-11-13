@@ -5,43 +5,64 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { StreamCall } from '@stream-io/video-react-sdk';
 import CustomVideoCallUI from '../components/VideoCallComponents/CustomVideoCallUI';
 import IncomingCallUI from '../components/VideoCallComponents/IncomingCallUI';
+import { useChatContext } from 'stream-chat-react';
 
 const VideoCallScreen = () => {
   const { videoClient, isClientReady, error } = useVideoClientContext();
+  const { client } = useChatContext();
   const { callID } = useParams();
   const { state } = useLocation();
   const memberstate = state?.videoCallMembers || [];
-  const channelType = state.channelType
-  const members = memberstate.map((member)=> member)
+  const memberIDs = Object.values(memberstate).map((user) => user.user_id);
   const navigate = useNavigate();
 
   const [call, setCall] = useState(null);
   const [callError, setCallError] = useState(null);
   const [accepted, setAccepted] = useState(false);
   const [declined, setDeclined] = useState(false);
+  const [memberDetails, setMemberDetails] = useState([]);
 
   useEffect(() => {
-    const initializeCall = async () => {
-      if (isClientReady && videoClient) {
-        try {
-          const callType = 'default';
-          const newCall = videoClient.call(callType, callID);
+    if (!isClientReady || !videoClient || !callID) return;
 
-          await newCall.getOrCreate({
-            ring: true,
-            data: { members: members},
-            role: 'user'
-          });
-          setCall(newCall);
-        } catch (err) {
-          console.error('Error initializing video call:', err);
-          setCallError('Unable to start video call');
-        }
+    const initializeCall = async () => {
+      try {
+        const callType = 'default';
+        const newCall = videoClient.call(callType, callID);
+
+        // Correctly format members with required `user_id`
+        const formattedMembers = memberIDs.map((id) => ({ user_id: id }));
+
+        await newCall.getOrCreate({
+          ring: true,
+          data: { members: formattedMembers },
+          role: 'user'
+        });
+        setCall(newCall);
+      } catch (err) {
+        console.error('Error initializing video call:', err);
+        setCallError('Unable to start video call');
+      }
+    };
+
+    const fetchMemberDetails = async () => {
+      try {
+        // Fetch user details for the members
+        const members = await Promise.all(
+          memberIDs.map(async (id) => {
+            const user = await client.queryUsers({ id }, { timeout: 5000 }); // Set timeout to 5000ms
+            return user.users[0];
+          })
+        );
+        setMemberDetails(members);
+      } catch (err) {
+        console.error('Error fetching member details:', err);
       }
     };
 
     initializeCall();
-  }, [isClientReady, videoClient, callID]);
+    fetchMemberDetails();
+  }, [isClientReady, videoClient, callID, memberIDs, client]);
 
   const acceptCall = async () => {
     if (call) {
@@ -90,7 +111,7 @@ const VideoCallScreen = () => {
       {!accepted && !declined ? (
         <IncomingCallUI AcceptCall={acceptCall} DeclineCall={declineCall} />
       ) : accepted ? (
-        <CustomVideoCallUI members={members} />
+        <CustomVideoCallUI members={memberDetails} />
       ) : null}
     </StreamCall>
   );

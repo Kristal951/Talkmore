@@ -5,7 +5,8 @@ import { UserContext } from '../../Contexts/UserContext';
 import moment from 'moment';
 import { FaRegTrashAlt } from "react-icons/fa";
 import { RxExit } from "react-icons/rx";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { RiGroup2Fill } from "react-icons/ri";
 
 const ChannelInfo = () => {
     const { channel } = useChatContext();
@@ -49,11 +50,21 @@ const ChannelInfo = () => {
     return (
         <div className="w-full h-full flex flex-col">
             <div className="flex w-full h-max items-center flex-col p-4 justify-center">
-                <img
-                    src={channel.data.image}
-                    alt="channel pic"
-                    className="w-[100px] h-[100px] rounded-full cursor-pointer hover:scale-105"
-                />
+                <div className="flex w-[100px] h-[100px] rounded-full cursor-pointer hover:scale-105">
+                    {
+                        channel.data.image ? (
+                            <img
+                                src={channel.data.image}
+                                alt="channel pic"
+                                className="w-full h-full rounded-full "
+                            />
+                        ) : (
+                            <RiGroup2Fill
+                                className="w-full h-full rounded-full text-blue-600"
+                            />
+                        )
+                    }
+                </div>
                 <p className="font-bold text-xl p-2">{channel.data.name}</p>
                 {channel.data.created_by && (
                     <p className='text-gray-400'>Created by <span className='text-[15px] text-black'>{channel.data.created_by.name}</span></p>
@@ -68,12 +79,24 @@ const ChannelInfo = () => {
                     <ul className="w-4/5 gap-4 flex flex-col">
                         {memberUsers.map((user) => (
                             <li key={user.id} className="flex items-center gap-4 p-2 border-b border-gray-200">
-                                <Avatar src={user.image} name={user.name} size="sm" />
+                                <Link
+                                    to={`/profile/${user.id}`}
+                                >
+                                    <Avatar src={user.image} name={user.name} size="sm" />
+                                </Link>
+                                
                                 <div className="flex flex-row justify-between items-center w-full">
                                     {user.id === userDetails.id ? (
                                         <span className="font-medium">You</span>
                                     ) : (
-                                        <span className="font-medium">{user.name || user.id}</span>
+                                        <Link
+                                            to={`/profile/${user.id}`}
+                                        >
+                                            <span className="font-medium">
+                                                {user.name || user.id}
+                                            </span>
+                                        </Link>
+                                        
                                     )}
                                     {user.role === 'owner' ? (
                                         <span className="text-sm border-blue-600 border-[1px] p-1 rounded-md">

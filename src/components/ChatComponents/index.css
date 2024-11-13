@@ -1,3 +1,13 @@
+
+.str-chat__thread-container{
+    height: 100vh;
+}
+.chakra-accordion{
+    height: 100%;
+}
+.chakra-accordion__item{
+    height: 100%;
+}
 .chakra-collapse{
     height: 100%;
 }

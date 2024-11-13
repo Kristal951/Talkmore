@@ -1,40 +1,40 @@
 import React from 'react';
-import { Attachment, Avatar, useMessageContext } from 'stream-chat-react';
+import { Avatar, MessageSimple, Tooltip, useMessageContext } from 'stream-chat-react';
+import { FaCheckDouble } from 'react-icons/fa';
 
-const CustomMessageRenderer = (messageProps) => {
-  const { message } = useMessageContext();
-  // console.log(message);
+const CustomMessageRenderer = (props) => {
+  const {lastReadUser } = useMessageContext();
 
-  const hasAttachments = message.attachments && message.attachments.length > 0;
-  // Extract different types of attachments
-  const audioAttachment = message.attachments?.find(attachment => attachment.type === 'audio');
-  const imageAttachment = message.attachments?.find(attachment => attachment.type === 'image');
-  const videoAttachment = message.attachments?.find(attachment => attachment.type === 'video');
+  const CustomDeliveredStatus = () => (
+    <div className="message-status">
+      <Tooltip content="Delivered">
+        <FaCheckDouble color="blue" size={16} />
+      </Tooltip>
+    </div>
+  );
+
+  const CustomReadStatus = () => (
+    <div className="message-status">
+      {lastReadUser ? (
+        <Tooltip content={`Read by ${lastReadUser.name}`}>
+          <Avatar image={lastReadUser.image} name={lastReadUser.name} size={20} />
+        </Tooltip>
+      ) : (
+        <Tooltip content="Read">
+          <FaCheckDouble color="green" size={16} />
+        </Tooltip>
+      )}
+    </div>
+  );
 
   return (
-    <div {...messageProps} className="custom-message-renderer">
-      <Avatar image={message.user.image} name={message.user.name} size={40} />
-      {/*  */}
-      <div className="message-content">
-        {/* Render text if no attachments */}
-        {(!audioAttachment && !imageAttachment && !videoAttachment) && (
-          <p>{message.text}</p>
-        )}
-
-        {/* Render each attachment type conditionally */}
-        {/* {imageAttachment && (
-          <Attachment attachments={[imageAttachment]} />
-        )} */}
-        
-        {/* {videoAttachment && (
-          <Attachment attachments={[videoAttachment]} />
-        )} */}
-        
-        {hasAttachments && (
-          <Attachment attachments={message.attachments}/>
-        )}
-      </div>
-    </div>
+    <MessageSimple
+      {...props}
+      MessageStatus={{
+        MessageDeliveredStatus: CustomDeliveredStatus,
+        MessageReadStatus: CustomReadStatus,
+      }}
+    />
   );
 };
 

@@ -95,6 +95,7 @@ const SignUp = () => {
                 isClosable: true,
                 position: 'top-right',
             });
+            return
         } finally {
             setLoading(false);
         }

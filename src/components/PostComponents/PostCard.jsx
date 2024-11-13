@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { FaTrash, FaCommentAlt } from "react-icons/fa";
 import { UserContext } from '../../Contexts/UserContext';
 import { deletePost, toggleLikePost } from '../../lib/AppriteFunction';
@@ -9,8 +9,9 @@ import {
 import moment from 'moment';
 import { Link, useNavigate } from 'react-router-dom';
 import useUserStatus from '../../hooks/useUserStatus';
-import unStarred from '../../assets/icons/unStarred.svg'
-import Starred from '../../assets/icons/starred.svg'
+import unStarred from '../../assets/icons/unStarred.svg';
+import Starred from '../../assets/icons/starred.svg';
+import './index.scss';
 
 const PostCard = ({ post, onDelete }) => {
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,7 @@ const PostCard = ({ post, onDelete }) => {
   const navigate = useNavigate();
   const userId = userDetails?.id;
   const isOnline = useUserStatus(post.creator.$id);
+  const videoRef = useRef(null); // Ref for the video element
 
   const getTimeAgo = (createdAt) => {
     const duration = moment.duration(moment().diff(moment(createdAt)));
@@ -42,7 +44,7 @@ const PostCard = ({ post, onDelete }) => {
       setLoading(true);
       await deletePost(post);
       setLoading(false);
-      onDelete(post.$id)
+      onDelete(post.$id);
       toast({
         title: 'Post Deleted',
         description: 'Your post has successfully been deleted.',
@@ -70,7 +72,6 @@ const PostCard = ({ post, onDelete }) => {
       const newLikeStatus = !isLiked;
       setIsLiked(newLikeStatus);
       setLikeCount(newLikeStatus ? likeCount + 1 : likeCount - 1);
-
       await toggleLikePost(post.$id, userId); 
     } catch (error) {
       console.error("Failed to toggle like:", error);
@@ -82,14 +83,38 @@ const PostCard = ({ post, onDelete }) => {
         isClosable: true,
         position: 'top-right',
       });
-      // Revert state if there was an error
       setIsLiked(!isLiked);
       setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
     }
-  }
+  };
+
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       entries.forEach(entry => {
+  //         if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+  //           videoRef.current.play();
+  //         } else {
+  //           videoRef.current.pause();
+  //         }
+  //       });
+  //     },
+  //     { threshold: 0.7 } // 70% of the video must be in view
+  //   );
+
+  //   if (videoRef.current) {
+  //     observer.observe(videoRef.current);
+  //   }
+
+  //   return () => {
+  //     if (videoRef.current) {
+  //       observer.unobserve(videoRef.current);
+  //     }
+  //   };
+  // }, []);
 
   return (
-    <div className="flex w-[60%] h-[600px] gap-[8px] border-[1px] shadow-xl p-4 m-4 bg-white flex-col rounded-lg">
+    <div className="flex w-[60%] h-[600px] gap-[8px] border-[1px] shadow-xl p-4 m-4 bg-white flex-col rounded-lg post-card">
       <div className="flex w-full flex-row h-[50px] justify-between items-center">
         <div className="flex flex-row gap-2">
           <Link to={`/profile/${post.creator.$id}`}>
@@ -107,11 +132,11 @@ const PostCard = ({ post, onDelete }) => {
         <p>{getTimeAgo(post.$createdAt)}</p>
       </div>
 
-      <div className="w-full flex flex-col items-start">
+      <div className="w-full flex h-max flex-col items-start">
         {post.mimeType.includes('image') ? (
           <img src={post.imgURL} alt="post media" className="w-full h-[430px] object-cover rounded-md" />
         ) : (
-          <video controls className="w-full h-[430px] object-cover rounded-md">
+          <video ref={videoRef} controls preload="auto" loop className="w-full h-[430px] rounded-md z-20">
             <source src={post.vidURL} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -129,14 +154,14 @@ const PostCard = ({ post, onDelete }) => {
           </div>
 
           <div className="flex gap-4 items-center">
-            <div className="flex w-[30px] h-[30px] ">
-              <img src={unStarred} alt="stared" className='w-full h-full object-contain'/>
+            <div className="flex w-[30px] h-[30px]">
+              <img src={unStarred} alt="stared" className="w-full h-full object-contain" />
             </div>
             <FaCommentAlt size={25} className="cursor-pointer" onClick={navigateToComments} />
             {userId === post.creator.$id && (
               <Popover placement="bottom">
                 <PopoverTrigger>
-                  <button isLoading={loading}>
+                  <button>
                     <FaTrash size={25} />
                   </button>
                 </PopoverTrigger>

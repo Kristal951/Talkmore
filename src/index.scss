@@ -31,3 +31,16 @@
         border-radius: 10px; /* Add rounded corners */
     }
 }
+@media (min-width: 360px) and (max-width: 600px) {
+    .section{
+        margin-left: 0;
+    }
+    .menu-icon{
+        display: flex;
+        position: absolute;
+        top: 14px;
+        right:5px;
+        color: #2563eb;
+        z-index: 9999;
+    }
+}

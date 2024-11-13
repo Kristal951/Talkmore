@@ -3,8 +3,9 @@ import { Button, Input, InputGroup, InputLeftAddon, useToast } from '@chakra-ui/
 import UserList from './UserList';
 import { useChatContext } from 'stream-chat-react';
 import { useDropzone } from 'react-dropzone';
-import { MdFileUpload } from "react-icons/md";
-import { getFileUrl, uploadFile } from '../../lib/AppriteFunction';
+import { MdCancel, MdFileUpload } from "react-icons/md";
+import { getfilePrev, getFileUrl, uploadFile } from '../../lib/AppriteFunction';
+import { useNavigate } from 'react-router-dom';
 
 const CreateChannel = ({ createType, setIsCreating }) => {
     const { client, setActiveChannel } = useChatContext(); // Destructure setActiveChannel from useChatContext
@@ -13,6 +14,7 @@ const CreateChannel = ({ createType, setIsCreating }) => {
     const [channelImage, setChannelImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const toast = useToast();
+    const navigate = useNavigate()
 
     const onDrop = useCallback(acceptedFiles => {
         const file = acceptedFiles[0];
@@ -22,10 +24,15 @@ const CreateChannel = ({ createType, setIsCreating }) => {
         }
     }, []);
 
+    const navigateBack =()=>{
+        navigate(-1)
+    }
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
         onDrop,
         accept: {
-            'image/*': ['.png', '.svg', '.jpeg', '.jpg']
+            'image/*': ['.png', '.svg', '.jpeg', '.jpg'],
+            'video/*': ['.mp4', '.mpeg', '.mkv']
         }
     });
 
@@ -58,7 +65,7 @@ const CreateChannel = ({ createType, setIsCreating }) => {
 
             if (channelImage) {
                 const uploadedFile = await uploadFile(channelImage);
-                fileUrl = await getFileUrl(uploadedFile.$id);
+                fileUrl = await getfilePrev(uploadedFile.$id);
             }
 
             const newChannel = client.channel(
@@ -69,12 +76,10 @@ const CreateChannel = ({ createType, setIsCreating }) => {
                 }
             );
 
-            await newChannel.create(); // Ensure the channel is created
+            await newChannel.create(); 
 
-            // Set the newly created channel as the active channel
             setActiveChannel(newChannel);
 
-            // Reset state and exit creation
             setChannelName('');
             setSelectedUsers([client.userID || '']);
             setChannelImage(null);
@@ -105,10 +110,16 @@ const CreateChannel = ({ createType, setIsCreating }) => {
 
     return (
         <div className='w-full h-screen relative'>
-            <div className="flex w-full h-[60px] items-center justify-start p-2 shadow-md z-50">
+            <div className="flex w-full h-[60px] items-center justify-start p-2 shadow-md z-50 relative">
                 <p className='capitalize font-bold text-xl text-blue-600'>
                     {createType === 'team' ? 'Create a new channel' : 'Send a direct message'}
                 </p>
+                <div className="flex right-4 w-[25px] h-[25px] absolute cursor-pointer">
+                    <MdCancel
+                        className='w-full h-full text-blue-600'
+                        onClick={navigateBack}
+                    />
+                </div>
             </div>
             <div className='mt-10 ml-4'>
                 {createType === 'team' && (
@@ -161,7 +172,7 @@ const CreateChannel = ({ createType, setIsCreating }) => {
                     }
                 </div>
 
-                <div className="flex w-[100px] absolute right-20 bottom-4">
+                <div className="flex w-max absolute right-10 bottom-4">
                     <Button colorScheme='blue' variant='solid' className='w-max p-2' onClick={createChannel}>
                         {createType === 'team' ? 'Create Channel' : 'Create Message Group'}
                     </Button>

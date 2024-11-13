@@ -4,9 +4,12 @@ import { AvatarBadge, Avatar, TabList, Tab, TabPanels, TabPanel, Tabs, Spinner }
 import { getUserPosts } from '../lib/AppriteFunction';
 import UserPostCard from '../components/PostComponents/UserPostCard';
 import useUserStatus from '../hooks/useUserStatus';
-import { useParams } from 'react-router-dom';
-import './index.css'
+import { useNavigate, useParams } from 'react-router-dom';
+import './index.scss'
 import { UserContext } from '../Contexts/UserContext';
+import { CiEdit } from "react-icons/ci";
+import EditProfileForm from '../components/others/EditProfileForm';
+
 
 const Profile = () => {
     const { userID } = useParams();
@@ -15,7 +18,8 @@ const Profile = () => {
     const [loading, setLoading] = useState(false)
     const [userPosts, setUserPosts] = useState([]);
     const { userDetails } = useContext(UserContext);
-    const isOnline = useUserStatus(userID); // Use custom hook to check online status
+    const isOnline = useUserStatus(userID);
+    const navigate = useNavigate() 
 
     useEffect(() => {
         const getCurrentUserPosts = async () => {
@@ -38,6 +42,7 @@ const Profile = () => {
                 setLoading(true)
                 const response = await client.queryUsers({ id: { $eq: userID } }, { limit: 1 });
                 setStreamUser(response.users[0]);
+                console.log(response.users[0])
             } catch (error) {
                 setLoading(false)
                 console.error('Error fetching Stream user:', error);
@@ -60,26 +65,36 @@ const Profile = () => {
 
     return (
         <div className='w-full h-screen overflow-hidden'>
-            {streamUser && 
-                <div className="w-full h-max flex flex-col items-center justify-center relative">
-                    <div className="flex w-max h-max p-6 flex-col items-center justify-center">
+            {/* <EditProfileForm/> */}
+                <div className="w-full h-max flex flex-col items-center justify-center">
+                    <div className="flex w-[300px] h-max p-6 flex-col items-center justify-center relative ">
                         <Avatar
-                            src={streamUser.image}
-                            size='lg'
+                            src={streamUser && streamUser.image}
+                            size='2xl'
                             className='cursor-pointer'
-                            title={streamUser.name}
+                            title={streamUser && streamUser.name}
                         >
                             {isOnline && (
-                                <AvatarBadge boxSize='1.25em' bg='green.500'/>
+                                <AvatarBadge boxSize='1em' bg='green.500'/>
                             )}
                         </Avatar>
-                        <h3 className='text-xl font-bold p-1'>{streamUser.name}</h3>
-                        <p className='text-gray-400'>{streamUser.tag}</p>
+                        <div className="flex p-2 flex-col items-center justify-center">
+                            <h3 className='text-xl font-bold p-1'>{streamUser && streamUser.name}</h3>
+                            <p className='text-gray-400 text-center'>{streamUser && streamUser.tag}</p>
+                            <div className='flex items-center justify-center'>
+                                <p>{streamUser && streamUser.bio}</p>
+                            </div>
+
+                            <div 
+                                className="flex absolute right-6 top-6 w-[40px] h-[40px] cursor-pointer hover:bg-gray-200 hover:rounded-full p-2" 
+                                onClick={()=> navigate(`/Profile/edit/${userID}`)}
+                            >
+                                <CiEdit className='w-full h-full'/>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
-            }
-            
-            <p>{userDetails.BIO}</p>
 
             <div className="w-full h-full p-2">
                 <Tabs isFitted variant='enclosed'>

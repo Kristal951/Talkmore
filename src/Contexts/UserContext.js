@@ -10,7 +10,7 @@ export const UserProvider = ({ children }) => {
     email: '',
     phoneNumber: '',
     imgUrl: '',
-    BIO: ''
+    Bio: ''
   });
 
   const value = {

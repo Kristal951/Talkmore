@@ -1,15 +1,24 @@
-import React, { useContext, useEffect, } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Sidebar from './components/Sidebar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { UserContext } from './Contexts/UserContext';
-import {useChatClientContext } from './Contexts/ClientContext'; 
+import { useChatClientContext } from './Contexts/ClientContext'; 
 import { Chat } from 'stream-chat-react';
-import { Spinner} from '@chakra-ui/react';
+import { Button, Spinner } from '@chakra-ui/react';
+import './index.scss';
+import { IoMenuSharp } from 'react-icons/io5';
+import { FaSearch } from 'react-icons/fa';
+import { MdOutlineCancel } from "react-icons/md";
+import MobileNav from './components/others/MobileNav';
 
 const RootLayout = () => {
     const { setUserDetails } = useContext(UserContext);
     const navigate = useNavigate();
     const { chatClient, isClientReady, error } = useChatClientContext();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
+    const { userDetails } = useContext(UserContext); 
+
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);  // Toggle sidebar visibility
 
     useEffect(() => {
         const payload = localStorage.getItem('appwritePayload');
@@ -23,14 +32,14 @@ const RootLayout = () => {
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 imgUrl: user.imgURL,
-                BIO: user.BIO
+                Bio: user.Bio
             });
         } else {
             navigate('/Login');
         }
 
         if (isClientReady && chatClient) {
-           return 
+            return;
         }
 
         if (error) {
@@ -39,30 +48,58 @@ const RootLayout = () => {
     }, [isClientReady, chatClient, error, navigate, setUserDetails]);
 
     if (error) {
-        return(
+        return (
             <div className='w-full h-screen flex justify-center items-center flex-col'>
                 <h2 className='font-bold text-xl'>Something went wrong.</h2>
                 <p>Please check your internet connection and try again</p>
-            </div> 
-        )
+            </div>
+        );
     }
 
     if (!isClientReady) {
-        return <div className='w-full h-screen flex items-center justify-center'>
-            <Spinner size="lg"/>
-        </div>;
+        return (
+            <div className='w-full h-screen flex items-center justify-center'>
+                <Spinner size="lg" />
+            </div>
+        );
     }
 
     return (
-            <Chat client={chatClient}>
-                <div className="w-full h-screen">
-                    <Sidebar />
-                    <section className="flex flex-1 h-full ml-[70px]">
-                        <Outlet />
-                    </section>
+        <Chat client={chatClient}>
+            <div className="w-full h-screen flex relative">
+                <div className="menu-icon cursor-pointer hidden" >
+                    {
+                        isSidebarOpen ? 
+                            <MdOutlineCancel 
+                                size={28} 
+                                onClick={toggleSidebar}
+                            /> 
+                        : 
+                            <IoMenuSharp 
+                                size={28} 
+                                onClick={toggleSidebar}
+                            />
+                    }
                 </div>
-            </Chat>
+                <div className="flex w-max h-max">
+                    {
+                        isSidebarOpen && (
+                            <MobileNav 
+                                toggleSidebar={toggleSidebar} 
+                            />
+                        )
+                    }
+                </div>
+
+                <Sidebar/>
+                
+                <section className='flex flex-1 h-full section ml-[70px]'>
+                    <Outlet />
+                </section>
+            </div>
+        </Chat>
     );
 };
 
 export default RootLayout;
+

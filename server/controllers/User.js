@@ -23,7 +23,7 @@ const SignUpUser = async (req, res) => {
     try {
         console.log(req.body);
 
-        const user_id = uuidv4();
+        const userId = uuidv4();
         const secret = process.env.TOKEN_SECRET;
         const { name, tag, phoneNumber, password, email } = req.body.userPayload;
 
@@ -50,13 +50,13 @@ const SignUpUser = async (req, res) => {
         const avatarURL = imgURL.href
 
         // Create a JWT token
-        const jwtToken = jwt.sign({ user_id }, secret, { expiresIn: '24h' });
+        const jwtToken = jwt.sign({ userId }, secret, { expiresIn: '24h' });
 
         // Create user document in Appwrite
         const appwritePayload = await databases.createDocument(
             '6713a7c9001581fc5175',  // Database ID
             '6713a7d200190a7a8f52',
-            user_id,
+            userId,
             {
                 name,
                 tag,
@@ -67,21 +67,22 @@ const SignUpUser = async (req, res) => {
             }
         );
 
-        const TokenResponse = await axios.post('http://localhost:5000/stream/token', { user_id });
-        const userToken = TokenResponse.data.token;
+        const userTokenResponse = await axios.post('http://localhost:5000/stream/token', { userId });
+        const userToken = userTokenResponse.data.token;
 
         // Add user to Stream Chat
         const streamPayload = await StreamClient.upsertUser(
             {
-                id: user_id,
+                id: userId,
                 name: name,
                 email: email,
                 image: avatarURL,
-                tag: tag
+                tag: tag,
+                Bio: appwritePayload.Bio
             },
             userToken
         );
-        const createdUser = streamPayload.users[user_id];
+        const createdUser = streamPayload.users[userId];
 
         return res.status(201).json({
             message: 'User created successfully',
@@ -119,9 +120,9 @@ const LoginUser = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid password' });
         }
-        const user_id = user.$id
+        const userId = user.$id
 
-        const jwtToken = jwt.sign({ user_id }, secret, { expiresIn: '24h' });
+        const jwtToken = jwt.sign({ userId }, secret, { expiresIn: '24h' });
 
         return res.status(200).json({ message: 'Login successful', user, jwtToken });
 

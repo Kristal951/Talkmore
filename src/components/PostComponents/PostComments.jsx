@@ -4,6 +4,7 @@ import { getPostByID, getCommentsByPostID, addComment } from '../../lib/AppriteF
 import { UserContext } from '../../Contexts/UserContext';
 import PostCommentCard from './PostCommentCard';
 import { Avatar, Button, Spinner, useToast } from '@chakra-ui/react';
+import './index.scss';
 
 const PostComments = () => {
   const { postId } = useParams();
@@ -66,7 +67,7 @@ const PostComments = () => {
   const fileType = post.mimeType;
 
   return (
-    <div className="flex-row flex w-full max-h-screen gap-6 relative overflow-hidden">
+    <div className="flex-row flex w-full max-h-screen gap-6 relative overflow-hidden post-comment-container">
       <div className="flex w-[50%] h-screen">
         <div className="flex w-full h-max gap-2 border shadow-xl p-4 m-4 bg-white flex-col rounded-lg">
           <div className="flex w-full flex-row h-[50px] justify-between items-center">

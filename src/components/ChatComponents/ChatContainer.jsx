@@ -30,7 +30,8 @@ const ChatContainer = ({ isCreating, setIsCreating, isEditing, setIsEditing, cre
             <Channel
                 EmptyStateIndicator={EmptyChannelState}
                 EmojiPicker={EmojiPicker}
-                // Message={CustomMessageRenderer}
+                Message={CustomMessageRenderer}
+                theme='str-chat__theme-dark'
                 // Message={(messageProps)=> <CustomMessageRenderer {...messageProps}/>}
             >
                 <ChannelInner setIsEditing={setIsEditing} />

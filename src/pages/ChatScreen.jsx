@@ -5,16 +5,30 @@ import TeamChannelList from '../components/ChatComponents/TeamChannelList';
 import TeamChannelPreview from '../components/ChatComponents/TeamChannelPreview';
 import { UserContext } from '../Contexts/UserContext';
 import 'stream-chat-react/dist/css/v2/index.css'; 
-import './index.css'
+import './index.scss'
 import ChatContainer from '../components/ChatComponents/ChatContainer';
+import { MessageSimple } from 'stream-chat-react';
 
 const ChatScreen = () => {
     const [createType, setCreateType] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [activeTab, setActiveTab] = useState('team');  // Track which tab (team or messaging) is active
+    const [activeTab, setActiveTab] = useState('team');
 
     const { userDetails } = useContext(UserContext);
+    const userId = userDetails?.id;
+
+    const customTeamChannelFilterFunction = (channels) => {
+        return channels.filter(channel => 
+          channel.type === "team" && channel.state.members[userId]
+        );
+      };
+    const customMessageChannelFilterFunction = (channels) => {
+        return channels.filter(channel => 
+          channel.type === "messaging" && channel.state.members[userId]
+        );
+      };
+
 
     return (
             <div className="flex flex-row w-full h-screen">
@@ -35,7 +49,9 @@ const ChatScreen = () => {
                         </button>
                     </div> */}
 
+                    
                     <ChannelList
+                        channelRenderFilterFn={customTeamChannelFilterFunction}
                         filters={{ members: { $in: [userDetails.id] }, type: "team" }}  // Dynamic filtering based on activeTab
                         List={(listProps) => (
                             <TeamChannelList
@@ -57,6 +73,7 @@ const ChatScreen = () => {
                         )}
                     />
                     <ChannelList
+                        channelRenderFilterFn={customMessageChannelFilterFunction}
                         filters={{ members: { $in: [userDetails.id] }, type: "messaging" }}  // Dynamic filtering based on activeTab
                         List={(listProps) => (
                             <TeamChannelList

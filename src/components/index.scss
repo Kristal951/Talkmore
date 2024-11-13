@@ -1,0 +1,82 @@
+.active {
+  background: #4b5563;
+}
+
+@media (min-width: 360px) and (max-width: 600px) {
+// body {
+//   font-size: 18px; 
+//   padding: 0px;   
+// }'
+
+.sideNav{
+  display: none;
+}
+
+.sidebar {
+  width: 90%;            /* Width adjustment for better usage of space */
+  position: fixed;    
+  background:rgba(75, 85, 99, 0.102);
+  backdrop-filter: blur(90px);   /* Ensures it stays on top and is fixed in place */
+  top: 0;
+  left: 0;
+  z-index: 9999;         
+  height: 100%;         
+  padding: 10px;       
+  overflow-y: auto;  
+  display: flex;
+  // backdrop-filter: blur(5px);
+  
+  .sidebar-inner{
+    justify-items: flex-start;
+    /* align-items: center; */
+    padding: 10px;
+    padding-top: 28px;
+    color: white;
+
+    a {
+      width: 100%;
+      align-items: center;  /* Align items vertically in the center */
+      justify-content: flex-start; /* Align content to the start */
+      color: #fff;
+      padding: 10px;
+      margin-bottom: 5px; /* Optional spacing between links */
+      text-decoration: none;
+
+      .active{
+        background: #4b5563;
+      }
+
+      .titles{
+        display: inline;
+        font-size: 18px;
+        color: white;
+      }
+    }
+
+    .logout-btn{
+      width: 100%;
+      align-items: center;  /* Align items vertically in the center */
+      justify-content: flex-start;
+    }
+  }
+
+  .menu-icon{
+    display: flex;
+    position: absolute;
+    right:5px;
+    color: #2563eb;
+    z-index: 9999;
+  }
+
+}
+
+.header {
+  font-size: 24px;
+  text-align: center;
+}
+
+.button {
+  padding: 12px 20px;
+  font-size: 16px;
+}
+}

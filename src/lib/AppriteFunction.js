@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const { Client, Storage, Databases, ID, Query } = require("appwrite");
 const AppwriteClient = new Client();
 AppwriteClient
@@ -63,10 +65,7 @@ export const getFileUrl = async (fileId) => {
             await deleteFileUrl(fileId);
             throw new Error('File URL not available');
         }
-        // 2000,
-        //     2000,
-        //     "top",
-        //     100
+        
         console.log(fileUrl);
         return fileUrl.href;
     } catch (error) {
@@ -74,6 +73,27 @@ export const getFileUrl = async (fileId) => {
         throw error;
     }
 };
+
+export const getfilePrev = async(fileId)=>{
+    try {
+        const fileUrl = await storage.getFilePreview(
+            '671116b10025310bdc15', 
+            fileId,
+            2000,
+            2000,
+            "top",
+            100
+        );
+        if (!fileUrl) {
+            await deleteFileUrl(fileId);
+            throw new Error('File URL not available');
+        }
+        return fileUrl.href;
+    } catch (error) {
+        console.error('Error getting file URL:', error);
+        throw error;
+    }
+}
 
 export const createPost = async (post) => {
     try {
@@ -84,8 +104,7 @@ export const createPost = async (post) => {
         const uploadedFile = await uploadFile(post.file);
     
         const fileUrl = await getFileUrl(uploadedFile.$id); 
-        console.log(uploadedFile.$id);
-
+       
         const fileType = post.file.type;
 
         if (fileType && fileType.startsWith('video/')) {
@@ -248,3 +267,45 @@ export const toggleLikePost = async (postId, userId) => {
       return 'Internal server error';
     }
 };
+
+export const updateProfile = async (updatedUser) => {
+    try {
+      const { name, tag, bio, email, file, userId } = updatedUser;
+      if (!userId) throw new Error("User ID is required for updating profile");
+  
+      let updatedData = {};
+      if (name) updatedData.name = name;
+      if (tag) updatedData.tag = tag;
+      if (bio) updatedData.Bio = bio;
+      if (email) updatedData.email = email;
+  
+      if (file instanceof File) {
+        const newFile = await uploadFile(file); 
+        const fileURL = await getFileUrl(newFile.$id);
+        updatedData.imgURL = fileURL;
+      }
+  
+      const response = await databases.updateDocument(
+        '6713a7c9001581fc5175',
+        '6713a7d200190a7a8f52',
+        userId,
+        updatedData
+      );
+  
+      await axios.post('http://localhost:5000/stream/updateUser', {
+        userId,
+        name: response.name,
+        tag: response.tag,
+        bio: response.Bio,
+        email: response.email,
+        imgUrl: response.imgURL  
+      });
+  
+      console.log("Profile updated successfully:", response);
+      return response;
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      throw error;
+    }
+  };
+  

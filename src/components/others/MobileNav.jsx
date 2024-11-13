@@ -1,57 +1,57 @@
-import React, { useContext, useRef } from 'react';
-import { IoHomeOutline, IoSettingsOutline } from "react-icons/io5";
-import { CiChat2 } from "react-icons/ci";
-import { FaRegUserCircle } from "react-icons/fa";
-import { NavLink, useNavigate } from 'react-router-dom';
-import { IoMdLogOut } from "react-icons/io";
-import { UserContext } from '../Contexts/UserContext';
-import { useChatClientContext } from '../Contexts/ClientContext';
-import './index.scss';
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useDisclosure } from '@chakra-ui/react';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useDisclosure } from '@chakra-ui/react'
+import React, { useContext, useRef } from 'react'
+import { CiChat2 } from 'react-icons/ci'
+import { FaRegUserCircle } from 'react-icons/fa'
+import { IoMdLogOut } from 'react-icons/io'
+import { IoHomeOutline, IoSettingsOutline } from 'react-icons/io5'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { UserContext } from '../../Contexts/UserContext'
+import { useChatClientContext } from '../../Contexts/ClientContext'
 
-const Sidebar = () => {
-  const { setUserDetails, userDetails } = useContext(UserContext);
-  const { setChatClient, chatClient } = useChatClientContext();
-  const navigate = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const initRef = useRef();
+const MobileNav = ({toggleSidebar}) => {
+    const { setUserDetails, userDetails } = useContext(UserContext);
+    const { setChatClient, chatClient } = useChatClientContext();
+    const navigate = useNavigate();
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const initRef = useRef();
 
-  const Logout = () => {
-    localStorage.removeItem('appwritePayload');
-    localStorage.removeItem('chakra-ui-color-mode');
-    localStorage.removeItem('streamPayload');
-    localStorage.removeItem('token');
-    localStorage.removeItem('emoji-mart.frequently');
-    localStorage.removeItem('emoji-mart.last');
-
-    setUserDetails({
-      id: '',
-      name: '',
-      tag: '',
-      email: '',
-      phoneNumber: '',
-      imgUrl: '',
-    });
-
-    if (chatClient) {
-      chatClient.disconnectUser();
-    }
-    setChatClient(null);
-    navigate('/Login');
-  };
+    const Logout = () => {
+        localStorage.removeItem('appwritePayload');
+        localStorage.removeItem('chakra-ui-color-mode');
+        localStorage.removeItem('streamPayload');
+        localStorage.removeItem('token');
+        localStorage.removeItem('emoji-mart.frequently');
+        localStorage.removeItem('emoji-mart.last');
+    
+        setUserDetails({
+          id: '',
+          name: '',
+          tag: '',
+          email: '',
+          phoneNumber: '',
+          imgUrl: '',
+        });
+    
+        if (chatClient) {
+          chatClient.disconnectUser();
+        }
+        setChatClient(null);
+        navigate('/Login');
+      };
+    
 
   return (
-    <>
-    <div className='w-[70px] h-screen bg-[#4b5563] fixed bg-opacity-10 flex flex-col sideNav'>
-      <div className="flex flex-col w-full items-center h-full gap-4 relative pt-6 p-2">
+    <div className='w-[70px] h-screen bg-[#4b5563] fixed bg-opacity-10 flex-col hidden sidebar'>
+      <div className="flex flex-col w-full items-center h-full gap-4 relative pt-6 p-2 sidebar-inner">
         <NavLink 
           to='/' 
           title='Home' 
           className={({ isActive }) => 
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
+          onClick={toggleSidebar}
         >
-          <IoHomeOutline className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb' />
+          <IoHomeOutline className='w-[50px] h-full px-2 py-[10px]' color='white' />
           <p className='titles hidden'>Home</p>
         </NavLink>
 
@@ -61,8 +61,9 @@ const Sidebar = () => {
           className={({ isActive }) => 
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
+          onClick={toggleSidebar}
         >
-          <CiChat2 className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb ' />
+          <CiChat2 className='w-[50px] h-full px-2 py-[10px]' color='white' />
           <p className='titles hidden'>Chat</p>
         </NavLink>
 
@@ -72,8 +73,9 @@ const Sidebar = () => {
           className={({ isActive }) => 
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
+          onClick={toggleSidebar}
         >
-          <FaRegUserCircle className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb ' />
+          <FaRegUserCircle className='w-[50px] h-full px-2 py-[10px]' color='white' />
           <p className='titles hidden'>Profile</p>
         </NavLink>
 
@@ -83,8 +85,9 @@ const Sidebar = () => {
           className={({ isActive }) => 
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
+          onClick={toggleSidebar}
         >
-          <IoSettingsOutline className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb' />
+          <IoSettingsOutline className='w-[50px] h-full px-2 py-[10px]' color='white' />
           <p className='titles hidden'>Settings</p>
         </NavLink>
 
@@ -116,8 +119,7 @@ const Sidebar = () => {
         </Popover>
       </div>
     </div>
-   </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default MobileNav
