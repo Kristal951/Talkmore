@@ -55,6 +55,7 @@ const EditProfileForm = () => {
       };
 
       const res = await updateProfile(updatedUser);
+      console.log(res);
   
       setUserDetails({
         name: res.name,

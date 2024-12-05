@@ -44,7 +44,7 @@ const PostCommentCard = ({ comment }) => {
         <p className="text-gray-600">{comment.content}</p>
         
         {comment.$createdAt && (
-          <p className="text-gray-500 text-[13px] p-[3px]">{getTimeAgo(comment.$createdAt)}</p>
+          <p className="text-gray-500 text-[13px] p-[3px]">{moment(comment.$createdAt).fromNow()}</p>
         )}
         
       </div>

@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { FaTrash, FaCommentAlt } from "react-icons/fa";
 import { UserContext } from '../../Contexts/UserContext';
-import { deletePost, toggleLikePost } from '../../lib/AppriteFunction';
+import { deletePost, likePost } from '../../lib/AppriteFunction';
 import {
   Spinner, useToast, Popover, PopoverTrigger, PopoverContent, PopoverHeader,
-  PopoverBody, PopoverFooter, Button, PopoverArrow, PopoverCloseButton, Avatar, AvatarBadge 
+  PopoverBody, PopoverFooter, Button, PopoverArrow, PopoverCloseButton, Avatar, AvatarBadge
 } from '@chakra-ui/react';
 import moment from 'moment';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,171 +15,148 @@ import './index.scss';
 
 const PostCard = ({ post, onDelete }) => {
   const [loading, setLoading] = useState(false);
+  const [likes, setLikes] = useState(post?.likes.map(user => user.$id) || []);
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(false);
   const { userDetails } = useContext(UserContext);
   const toast = useToast();
   const navigate = useNavigate();
+  const videoRef = useRef(null);
   const userId = userDetails?.id;
   const isOnline = useUserStatus(post.creator.$id);
-  const videoRef = useRef(null); // Ref for the video element
+  // console.log(likes, isLiked);
+  useEffect(() => {
+    setIsLiked(likes.includes(userId));
+  }, [likes, userId]);
 
-  const getTimeAgo = (createdAt) => {
-    const duration = moment.duration(moment().diff(moment(createdAt)));
-    return duration.asDays() >= 1
-      ? `${Math.floor(duration.asDays())} day${Math.floor(duration.asDays()) > 1 ? 's' : ''} ago`
-      : duration.asHours() >= 1
-      ? `${Math.floor(duration.asHours())} hour${Math.floor(duration.asHours()) > 1 ? 's' : ''} ago`
-      : duration.asMinutes() >= 1
-      ? `${Math.floor(duration.asMinutes())} minute${Math.floor(duration.asMinutes()) > 1 ? 's' : ''} ago`
-      : `${Math.floor(duration.asSeconds())} second${Math.floor(duration.asSeconds()) > 1 ? 's' : ''} ago`;
+  console.log(post.likes.length)
+  const getTimeAgo = (createdAt) => moment(createdAt).fromNow();
+
+  const handleLikePost = async (e) => {
+    e.stopPropagation();
+    const updatedLikes = likes.includes(userId)
+      ? likes.filter(id => id !== userId)
+      : [...likes, userId];
+    setLikes(updatedLikes);
+    try {
+      const res = await likePost(post.$id, updatedLikes);
+      console.log(res);
+    } catch (error) {
+      console.error("Error updating likes:", error);
+      toast({
+        title: "Error",
+        description: "Unable to update likes.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleDeletePost = async () => {
+    setLoading(true);
+    try {
+      await deletePost(post);
+      onDelete(post.$id);
+      toast({
+        title: "Post Deleted",
+        description: "Your post has been successfully deleted.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      toast({
+        title: "Error",
+        description: "Unable to delete post.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const navigateToComments = () => {
     navigate(`/post/${post.$id}/comments`);
   };
 
-  const handleDeletePost = async () => {
-    try {
-      setLoading(true);
-      await deletePost(post);
-      setLoading(false);
-      onDelete(post.$id);
-      toast({
-        title: 'Post Deleted',
-        description: 'Your post has successfully been deleted.',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-      });
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-      toast({
-        title: 'Post Deletion Failed',
-        description: 'Something went wrong.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-      });
-    }
-  };
-
-  const handleToggleLike = async () => {
-    try {
-      const newLikeStatus = !isLiked;
-      setIsLiked(newLikeStatus);
-      setLikeCount(newLikeStatus ? likeCount + 1 : likeCount - 1);
-      await toggleLikePost(post.$id, userId); 
-    } catch (error) {
-      console.error("Failed to toggle like:", error);
-      toast({
-        title: 'Like Failed',
-        description: 'An error occurred while liking the post.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-      });
-      setIsLiked(!isLiked);
-      setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
-    }
-  };
-
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       entries.forEach(entry => {
-  //         if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
-  //           videoRef.current.play();
-  //         } else {
-  //           videoRef.current.pause();
-  //         }
-  //       });
-  //     },
-  //     { threshold: 0.7 } // 70% of the video must be in view
-  //   );
-
-  //   if (videoRef.current) {
-  //     observer.observe(videoRef.current);
-  //   }
-
-  //   return () => {
-  //     if (videoRef.current) {
-  //       observer.unobserve(videoRef.current);
-  //     }
-  //   };
-  // }, []);
-
   return (
-    <div className="flex w-[60%] h-[600px] gap-[8px] border-[1px] shadow-xl p-4 m-4 bg-white flex-col rounded-lg post-card">
-      <div className="flex w-full flex-row h-[50px] justify-between items-center">
-        <div className="flex flex-row gap-2">
+    <div className="flex w-full lg:w-[60%] h-[900px] gap-4 border rounded-lg shadow-lg bg-white p-4 m-4 flex-col">
+      {/* Post Header */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
           <Link to={`/profile/${post.creator.$id}`}>
-            <Avatar src={post.creator.imgURL} alt="img" className="cursor-pointer">
+            <Avatar src={post.creator.imgURL}>
               {isOnline && <AvatarBadge boxSize="1.25em" bg="green.500" />}
             </Avatar>
           </Link>
-          <div className="flex flex-col">
+          <div>
             <Link to={`/profile/${post.creator.$id}`}>
               <p className="font-bold">{post.creator.name}</p>
-              <p className="text-sm text-[#4b5563] opacity-50">{post.creator.tag}</p>
+              <p className="text-sm text-gray-500">{post.creator.tag}</p>
             </Link>
           </div>
         </div>
-        <p>{getTimeAgo(post.$createdAt)}</p>
+        <p className="text-gray-500 text-sm">{getTimeAgo(post.$createdAt)}</p>
       </div>
 
-      <div className="w-full flex h-max flex-col items-start">
-        {post.mimeType.includes('image') ? (
-          <img src={post.imgURL} alt="post media" className="w-full h-[430px] object-cover rounded-md" />
+      {/* Post Media */}
+      <div className="w-full">
+        {post.mimeType.includes("image") ? (
+          <img src={post.imgURL} alt="post media" className="w-full h-80 object-cover rounded-md" />
         ) : (
-          <video ref={videoRef} controls preload="auto" loop className="w-full h-[430px] rounded-md z-20">
+          <video ref={videoRef} controls className="w-full h-80 rounded-md">
             <source src={post.vidURL} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         )}
-        <h2 className="text-2xl font-semibold mt-2">{post.caption}</h2>
-        <p className="text-gray-600 mt-1">{post.description}</p>
+        <h2 className="mt-2 text-2xl font-semibold">{post.caption}</h2>
+        <p className="text-gray-700 mt-1">{post.description}</p>
+      </div>
 
-        <div className="mt-2 w-full flex flex-row gap-2 justify-between items-center">
-          <div className="flex flex-row gap-2">
-            {post.tags.map((tag, index) => (
-              <span key={index} className="px-2 py-1 bg-gray-200 rounded-md text-sm">
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <div className="flex gap-4 items-center">
-            <div className="flex w-[30px] h-[30px]">
-              <img src={unStarred} alt="stared" className="w-full h-full object-contain" />
-            </div>
-            <FaCommentAlt size={25} className="cursor-pointer" onClick={navigateToComments} />
-            {userId === post.creator.$id && (
-              <Popover placement="bottom">
-                <PopoverTrigger>
-                  <button>
-                    <FaTrash size={25} />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <PopoverArrow />
-                  <PopoverCloseButton />
-                  <PopoverHeader>Confirmation</PopoverHeader>
-                  <PopoverBody>Are you sure you want to delete this post?</PopoverBody>
-                  <PopoverFooter display="flex" justifyContent="flex-end">
-                    <Button colorScheme="red" onClick={handleDeletePost} isDisabled={loading}>
-                      Yes
-                    </Button>
-                    <Button ml={3}>No</Button>
-                  </PopoverFooter>
-                </PopoverContent>
-              </Popover>
-            )}
-          </div>
+      {/* Post Footer */}
+      <div className="flex justify-between mt-2">
+        {/* Tags */}
+        <div className="flex gap-2">
+          {(post.tags || []).map((tag, idx) => (
+            <span key={idx} className="px-2 py-1 bg-gray-200 rounded-md text-sm">
+              #{tag}
+            </span>
+          ))}
+        </div>
+        {/* Actions */}
+        <div className="flex items-center gap-4">
+          <button onClick={handleLikePost} className='w-8 h-8 cursor-pointer'>
+            <img
+              src={isLiked ? Starred : unStarred}
+              alt="like"
+              className="w-full h-full"
+            />
+            <p>{post.likes.length}</p>
+          </button>
+          <FaCommentAlt className="cursor-pointer w-6 h-6" onClick={navigateToComments} />
+          {userId === post.creator.$id && (
+            <Popover>
+              <PopoverTrigger >
+                {/* <button className='w-8 h-8'> */}
+                  <FaTrash className='w-6 h-6 cursor-pointer'/>
+                {/* </button> */}
+              </PopoverTrigger>
+              <PopoverContent>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverHeader>Confirmation</PopoverHeader>
+                <PopoverBody>Are you sure you want to delete this post?</PopoverBody>
+                <PopoverFooter>
+                  <Button onClick={handleDeletePost} colorScheme="red" isLoading={loading}>
+                    Delete
+                  </Button>
+                </PopoverFooter>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </div>
     </div>

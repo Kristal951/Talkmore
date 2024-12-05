@@ -6,8 +6,8 @@ import { Button, Spinner } from '@chakra-ui/react';
 import axios from 'axios';
 import PostCard from '../components/PostComponents/PostCard';
 import './index.scss'
-import { IoMenuSharp } from "react-icons/io5";
 import LOGO from '../assets/images/comp2.png'
+import Search from './Search';
 
 const Home = () => {
    
@@ -15,7 +15,12 @@ const Home = () => {
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [searching, setSearching] = useState(false);
     const {userDetails} = useContext(UserContext)
+
+    const navigateToSearch=()=>{
+        // navigate(`/Search/result?query=${encodeURIComponent(query)}`)
+    }
 
     const getAllPosts = async () => {
         try {
@@ -69,13 +74,10 @@ const Home = () => {
     return (
         <div className='w-full h-screen'>
 
-            <div className="w-full h-[60px] p-2 shadow-md gap-6 bg-[#4b5563] bg-opacity-10 backdrop-blur-lg border-[1px] border-[rgba(255,255,255,0.18)] left-[70px] flex fixed items-center flex-row top-0 topbar">
-                {/* <div className="flex w-[300px] h-[100%] border-[1px] border-black logo-contianer"> */}
+            <div className="w-full h-[60px] p-2 shadow-md gap-6 bg-[#4b5563] bg-opacity-10 backdrop-blur-lg border-[1px] border-[rgba(255,255,255,0.18)] left-[70px] flex fixed items-center flex-row top-0 topbar z-[9000]">
                 <Link to="/" className='h-full'>
                     <img src={LOGO} alt="Logo" className='object-contain h-full'/>
                 </Link>
-                  
-                {/* </div> */}
                 
                 <div className="flex right-40 items-center justify-center absolute create-post-btn-1">
                     <Button colorScheme='blue' variant='solid' onClick={() => navigate('/CreatePost')}>
@@ -95,6 +97,7 @@ const Home = () => {
                         type='search'
                         className='w-full rounded-md bg-[#4b5563] bg-opacity-15 p-[5px] border-0 focus:outline-none'
                         placeholder='Search anything'
+                        onClick={()=> setSearching(true)}
                     />
                 </div>
                 <div className="flex w-[50px] h-[50px] absolute right-20 cursor-pointer profile-img">
@@ -118,7 +121,7 @@ const Home = () => {
 
                 {loading && (
                     <div className="flex justify-center items-center h-screen">
-                        <Spinner size="xl" />
+                        <Spinner size="lg" />
                     </div>
                 )}
 
@@ -133,8 +136,13 @@ const Home = () => {
                         <PostCard key={post.$id} post={post} onDelete={handleDelete}/>
                     ))}
                 </div>
- 
             </div>
+
+            {
+                searching && (
+                    <Search/>
+                )
+            }
         </div>
     );
 };

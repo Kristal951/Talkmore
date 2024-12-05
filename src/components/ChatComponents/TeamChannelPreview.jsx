@@ -6,23 +6,19 @@ import { FaUserCircle } from "react-icons/fa";
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import useUserStatus from '../../hooks/useUserStatus';
 
-const TeamChannelPreview = ({ channel, type , latetMessagePreview}) => {
+const TeamChannelPreview = ({ channel, type }) => {
   const { channel: activeChannel, client, setActiveChannel } = useChatContext();
-  
-  // Get the user ID for status tracking
   const members = Object.values(channel.state.members).filter(({ user }) => user.id !== client.userID);
-  console.log(members[0]);
   const userID = members[0]?.user?.id || null;
-  
   const isOnline = useUserStatus(userID);
 
   if (!members.length) return null;
 
-  const time = members[0]?.user?.last_active;
+  const lastActive = members[0]?.user?.last_active;
   const currentTime = moment();
-  const givenTime = moment(time);
+  const givenTime = moment(lastActive);
   const hoursDiff = currentTime.diff(givenTime, 'hours');
-  
+
   let lastSeen = '';
   if (hoursDiff >= 1 && hoursDiff < 24) {
     lastSeen = `${hoursDiff} hour(s) ago`;
@@ -36,23 +32,29 @@ const TeamChannelPreview = ({ channel, type , latetMessagePreview}) => {
   const channelImage = channel.data.image;
 
   const TeamPreview = () => (
-    <div className={`flex w-[80%] h-[50px] justify-start items-center ${isActive ? 'text-blue-600' : 'text-blue-600'}`}>
-      <div className="h-full w-[50px] flex justify-center items-center">
+    <div className={`w-full flex flex-row items-center relative space-x-2 h-[60px] px-2 ${isActive ? 'text-blue-600 border-l-[2px] border-blue-600' : 'text-blue-600'}`}>
         {channelImage ? (
           <img src={channelImage} alt="Channel Avatar" className="w-10 h-10 rounded-full" />
         ) : (
           <RiGroup2Fill size={40} className={isActive ? 'bg-opacity-15' : 'text-blue-600'} />
         )}
+        <div className="flex flex-col">
+          <p className={`font-bold truncate ${isActive ? 'text-blue-600' : 'text-blue-600'}`}>
+            {channel?.data?.name || 'Unnamed Channel'}
+          </p>
+          {channel.state.unreadCount > 0 && (
+              <div className="flex absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 items-center justify-center">
+                {channel.state.unreadCount}
+              </div>
+            )
+          }
       </div>
-      <p className={`font-bold truncate ${isActive ? 'text-blue-600' : 'text-blue-600'}`}>
-        {channel?.data?.name || 'Unnamed Channel'}
-      </p>
+      
     </div>
   );
 
-  // Direct Message Preview
   const DirectPreview = () => (
-    <div className={`w-full flex flex-row items-center space-x-2 h-[60px] px-2 ${isActive ? 'text-blue-600 border-l-[2px] border-blue-600' : 'text-blue-600'}`}>
+    <div className={`w-full flex flex-row items-center relative space-x-2 h-[60px] px-2 ${isActive ? 'text-blue-600 border-l-[2px] border-blue-600' : 'text-blue-600'}`}>
       {members[0]?.user?.image ? (
         <Avatar src={members[0]?.user?.image} className="w-10 h-10 ml-2 rounded-full">
           {isOnline && <AvatarBadge boxSize='1.10em' bg='green.500' />}
@@ -64,17 +66,16 @@ const TeamChannelPreview = ({ channel, type , latetMessagePreview}) => {
         <p className={`font-bold truncate ${isActive ? 'text-blue-600' : 'text-blue-600'}`}>
           {members[0]?.user?.name || 'Anonymous User'}
         </p>
-        <p>{latetMessagePreview}</p>
-        {lastSeen && lastSeen > 0 && (
-          <p className="text-sm text-gray-500">
-            {lastSeen}
-          </p>
+        {!isOnline && <p>{lastSeen}</p>}
+        {channel.state.unreadCount > 0 && (
+          <div className="flex absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 items-center justify-center">
+            {channel.state.unreadCount}
+          </div>
         )}
       </div>
     </div>
   );
 
-  // Set active channel
   const handleClick = () => {
     if (setActiveChannel) setActiveChannel(channel);
   };

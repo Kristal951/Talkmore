@@ -105,7 +105,10 @@ const TeamChannelHeader = ({ setIsEditing }) => {
                             <FaUserCircle className='w-10 h-10' />
                         )}
                         <div className="flex flex-col">
-                            <h3 className="ml-2 text-blue-600 text-xl">
+                            <h3 
+                                className="ml-2 text-blue-600 text-xl cursor-pointer"
+                                onClick={navigateToChannelInfoScreen}
+                            >
                                 {members[0]?.user?.name || 'Anonymous User'}
                             </h3>
                             {typingIndicator}

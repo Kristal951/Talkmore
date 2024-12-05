@@ -20,6 +20,7 @@ AppwriteClient
     .setProject('670ea1ea0016e28a21d8'); // Replace with your project ID
 
 const SignUpUser = async (req, res) => {
+    
     try {
         console.log(req.body);
 

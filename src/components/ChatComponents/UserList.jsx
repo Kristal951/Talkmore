@@ -76,7 +76,7 @@ const UserList = ({ setSelectedUser, selectedUser }) => {
             {loading && <Spinner size="lg" />}
             {listEmpty && <p>No users found.</p>}
             {error && <div className="flex">
-                Error loading users, please wait a little and rload the page.
+                Error loading users, please wait a little and reload the page.
             </div> 
             }
             {users && users.map(user => (

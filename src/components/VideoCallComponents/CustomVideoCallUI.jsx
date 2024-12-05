@@ -12,8 +12,7 @@ const CustomCallControls = () => {
 
     const call = useCall();
     const callingState = useCallCallingState();
-    const navigate = useNavigate();
-    console.log(call.state);
+    const navigate = useNavigate()
 
     const handleLeaveCall = async () => {
         try {
@@ -50,6 +49,12 @@ const CustomCallControls = () => {
 const CustomVideoCallUI = () => {
     const { videoClient } = useVideoClientContext();
     const call = useCall();
+    const { useCallCallingState } = useCallStateHooks();
+
+    const callingState = useCallCallingState();
+    const navigate = useNavigate();
+    console.log(callingState);
+
 
     return (
         <div className='w-full h-full'>

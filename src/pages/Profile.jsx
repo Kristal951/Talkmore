@@ -104,15 +104,16 @@ const Profile = () => {
                     </TabList>
                     <TabPanels>
                         <TabPanel>
-                            <div className="flex flex-wrap flex-row h-[500px] w-full p-2 gap-4 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray scrollbar-track-gray scrollbar-rounded">
-                                {userPosts.length > 0 ? (
-                                    userPosts.map((post, i) => (
-                                        <UserPostCard post={post} key={i} />
-                                    ))
-                                ) : (
-                                    <p>No posts available</p>
-                                )}
-                            </div>
+                        <div className="flex flex-wrap h-[500px] w-full p-2 gap-8 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray scrollbar-track-gray scrollbar-rounded">
+                            {userPosts.length > 0 ? (
+                                userPosts.map((post, i) => (
+                                    <UserPostCard post={post} />
+                                ))
+                            ) : (
+                                <p>No posts available</p>
+                            )}
+                        </div>
+
                         </TabPanel>
                         <TabPanel>
                             <p>Starred posts will appear here.</p>

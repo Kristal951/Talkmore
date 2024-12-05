@@ -16,6 +16,7 @@ import VideoCallScreen from './pages/VideoCallScreen'
 import AudioCallScreen from './pages/AudioCallScreen'
 import ChannelInfo from './components/ChatComponents/ChannelInfo'
 import EditProfileForm from './components/others/EditProfileForm'
+import Search from './pages/Search'
 
 const App = () => {
   return (
@@ -39,6 +40,7 @@ const App = () => {
                   <Route path="/AudioCall/:callID" element={<AudioCallScreen/>} />
                   <Route path="/Chat/:channelID/Info" element={<ChannelInfo/>} />
                   <Route path="/Profile/edit/:userId" element={<EditProfileForm/>} />
+                  <Route path="/Search/results" element={<Search/>} />
                 </Route>
               </Routes>
             </Router>

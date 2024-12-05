@@ -17,12 +17,6 @@ export const uploadFile = async (file) => {
             throw new Error('File size exceeds the maximum limit of 50 MB.');
         }
 
-        // Optional: Check MIME type
-        // const allowedTypes = ['video/mp4', 'video/x-matroska']; // Add more types as needed
-        // if (!allowedTypes.includes(file.type)) {
-        //     throw new Error('Unsupported file type. Please upload a valid video file.');
-        // }
-
         const uploadedFile = await storage.createFile(
             '671116b10025310bdc15', 
             ID.unique(), 
@@ -308,4 +302,42 @@ export const updateProfile = async (updatedUser) => {
       throw error;
     }
   };
+  
+  export const queryPosts= async(query)=>{
+    try {
+        const posts = await databases.listDocuments(
+            '6713a7c9001581fc5175',  // Database ID
+            '6713ac4e0004c0f113e9',  // Collection ID
+            [Query.search('caption', query)] 
+        );
+
+        if(!posts){
+            return Error
+        }
+
+        return posts
+    } catch (error) {
+        console.log(error);
+    }
+  }
+
+  export const likePost = async(postId, likesArray)=> {
+    try {
+        console.log(postId);
+      const updatedPost = await databases.updateDocument(
+        '6713a7c9001581fc5175',  
+        '6713ac4e0004c0f113e9',
+        postId,
+        {
+          likes: likesArray,
+        }
+      );
+    console.log(updatedPost);
+      if (!updatedPost) throw Error;
+  
+      return updatedPost;
+    } catch (error) {
+      console.log(error);
+    }
+  }
   

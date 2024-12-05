@@ -4,11 +4,9 @@ import React from 'react'
 
 const IncomingCallUI = ({AcceptCall, DeclineCall}) => {
     const call = useCall();
-    console.log(call.state);
 
     const createdBy = call.state.createdBy.name
     const createdByImage = call.state.createdBy.image
-    console.log(createdByImage);
     
   return (
     <div className="w-full h-screen flex items-center justify-center">
