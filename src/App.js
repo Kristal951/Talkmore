@@ -17,6 +17,9 @@ import AudioCallScreen from './pages/AudioCallScreen'
 import ChannelInfo from './components/ChatComponents/ChannelInfo'
 import EditProfileForm from './components/others/EditProfileForm'
 import Search from './pages/Search'
+import CreateChannel from './components/ChatComponents/CreateChannel'
+import Index from './components/Notifications/Index'
+import Settings from './pages/Settings'
 
 const App = () => {
   return (
@@ -34,13 +37,16 @@ const App = () => {
                   <Route index element={<Home/>}/>
                   <Route path='/CreatePost' element={<CreatePostForm/>}/>
                   <Route path='/Chat' element={<ChatScreen/>}/>
+                  <Route path='/Chat/createChannel' element={<CreateChannel/>}/>
                   <Route path="/post/:postId/comments" element={<PostComments />} />
                   <Route path="/profile/:userID" element={<Profile/>} />
                   <Route path="/VideoCall/:callID" element={<VideoCallScreen/>} />
                   <Route path="/AudioCall/:callID" element={<AudioCallScreen/>} />
                   <Route path="/Chat/:channelID/Info" element={<ChannelInfo/>} />
                   <Route path="/Profile/edit/:userId" element={<EditProfileForm/>} />
+                  <Route path="/Profile/notifications/:userId" element={<Index/>} />
                   <Route path="/Search/results" element={<Search/>} />
+                  <Route path="/Settings" element={<Settings />} />
                 </Route>
               </Routes>
             </Router>

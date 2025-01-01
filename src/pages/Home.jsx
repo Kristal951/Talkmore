@@ -72,9 +72,8 @@ const Home = () => {
     }, []);
 
     return (
-        <div className='w-full h-screen'>
-
-            <div className="w-full h-[60px] p-2 shadow-md gap-6 bg-[#4b5563] bg-opacity-10 backdrop-blur-lg border-[1px] border-[rgba(255,255,255,0.18)] left-[70px] flex fixed items-center flex-row top-0 topbar z-[9000]">
+        <div className='w-full h-screen dark:bg-darkBackground'>
+            <div className="w-full h-[60px] p-2 shadow-md gap-6 bg-[#4b5563] dark:bg-darkBackground2 border-0 bg-opacity-10 backdrop-blur-lg border-[rgba(255,255,255,0.18)] left-[70px] flex fixed items-center flex-row top-0 topbar z-[9000]">
                 <Link to="/" className='h-full'>
                     <img src={LOGO} alt="Logo" className='object-contain h-full'/>
                 </Link>
@@ -89,13 +88,13 @@ const Home = () => {
                         Add Post
                     </button>
                 </div>
-                <div className="flex w-2/5 gap-2 rounded-md bg-white shadow-md p-2 relative left-16 flex-row h-max justify-center items-center searchbar">
+                <div className="flex w-2/5 gap-2 rounded-md bg-white dark:bg-darkBackground shadow-md p-2 relative left-16 flex-row h-max justify-center items-center searchbar">
                     <div className="flex">
                         <FaSearch />
                     </div>
                     <input
                         type='search'
-                        className='w-full rounded-md bg-[#4b5563] bg-opacity-15 p-[5px] border-0 focus:outline-none'
+                        className='w-full rounded-md bg-[#4b5563] bg-opacity-15 p-[5px] border-0 dark:bg-darkBackground2 focus:outline-none'
                         placeholder='Search anything'
                         onClick={()=> setSearching(true)}
                     />
@@ -140,7 +139,7 @@ const Home = () => {
 
             {
                 searching && (
-                    <Search/>
+                    <Search setSearching={setSearching}/>
                 )
             }
         </div>

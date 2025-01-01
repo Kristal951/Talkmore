@@ -46,6 +46,7 @@ export const ChatClientProvider = ({ children }) => {
         } catch (err) {
             console.error('Error initializing chat client:', err);
             setError(err.message);
+            console.log(err.message)
         }
     };
 

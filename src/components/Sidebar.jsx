@@ -42,7 +42,7 @@ const Sidebar = () => {
 
   return (
     <>
-    <div className='w-[70px] h-screen bg-[#4b5563] fixed bg-opacity-10 flex flex-col sideNav'>
+    <div className='w-[70px] h-screen bg-[#4b5563] dark:bg-darkBackground2 transition-colors fixed bg-opacity-10 flex flex-col sideNav'>
       <div className="flex flex-col w-full items-center h-full gap-4 relative pt-6 p-2">
         <NavLink 
           to='/' 
@@ -51,7 +51,7 @@ const Sidebar = () => {
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
         >
-          <IoHomeOutline className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb' />
+          <IoHomeOutline className='w-[50px] h-full px-2 py-[10px] dark:text-white text-primary'/>
           <p className='titles hidden'>Home</p>
         </NavLink>
 
@@ -62,7 +62,7 @@ const Sidebar = () => {
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
         >
-          <CiChat2 className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb ' />
+          <CiChat2 className='w-[50px] h-full px-2 py-[10px] dark:text-white text-primary'/>
           <p className='titles hidden'>Chat</p>
         </NavLink>
 
@@ -73,7 +73,7 @@ const Sidebar = () => {
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
         >
-          <FaRegUserCircle className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb ' />
+          <FaRegUserCircle className='w-[50px] h-full px-2 py-[10px] dark:text-white text-primary'/>
           <p className='titles hidden'>Profile</p>
         </NavLink>
 
@@ -84,7 +84,7 @@ const Sidebar = () => {
             `flex rounded-md items-center justify-center hover:bg-[#4b5563] hover:bg-opacity-15 navlinks ${isActive ? 'bg-[#4b5563] bg-opacity-15' : ''}`
           }
         >
-          <IoSettingsOutline className='w-[50px] h-full px-2 py-[10px]' color=' #2563eb' />
+          <IoSettingsOutline className='w-[50px] h-full px-2 py-[10px] dark:text-white text-primary'/>
           <p className='titles hidden'>Settings</p>
         </NavLink>
 
