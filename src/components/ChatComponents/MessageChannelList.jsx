@@ -13,7 +13,6 @@ const MessageChannelList = ({
   setIsCreating,
   setIsEditing,
 }) => {
-    
   if (error) {
     return type === "team" ? (
       <div className="w-full h-screen flex justify-center items-center">
@@ -24,20 +23,17 @@ const MessageChannelList = ({
     ) : null;
   }
 
-  // Render loading state
   if (loading) {
     return (
       <div className="w-full h-screen flex justify-center items-center">
-        <p className="text-blue-600">
+        <p className="text-blue-600 dark:text-white">
           {type === "team" ? "Channels" : "Messages"} are loading...
         </p>
       </div>
     );
   }
   return (
-    <div className="w-full h-screen flex-col">
-      {/* <div className="flex w-full h-[30px] absolute">
-      </div> */}
+    <div className="w-full h-screen flex-col flex">
       <div className="flex flex-col gap-4">{children}</div>
     </div>
   );

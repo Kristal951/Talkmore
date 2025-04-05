@@ -1,9 +1,14 @@
 import React from "react";
-import { useMessageContext, useChannelActionContext } from "stream-chat-react";
+import {
+  useMessageContext,
+  useChannelActionContext,
+  useChatContext,
+} from "stream-chat-react";
 
 const CustomPinIndicator = () => {
   const { message } = useMessageContext("CustomPinIndicator");
   const { jumpToMessage } = useChannelActionContext();
+  const { client } = useChatContext();
 
   const pinnedBy = message.pinned_by?.name || message.pinned_by?.id;
 
@@ -26,7 +31,12 @@ const CustomPinIndicator = () => {
           {message.text || "No message text available"}
         </p>
         <p className="text-sm text-gray-500">
-          Pinned by <span className="font-semibold">{pinnedBy}</span>
+          Pinned by{" "}
+          <span className="font-semibold">
+            {message.pinned_by.id === client.userID
+              ? `You at ${message.pinned_at}`
+              : `${pinnedBy} at ${message.pinned_at}`}
+          </span>
         </p>
       </div>
     </div>

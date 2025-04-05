@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getPostByID, getCommentsByPostID, addComment } from '../../lib/AppriteFunction';
 import { UserContext } from '../../Contexts/UserContext';
-import PostCommentCard from './PostCommentCard';
+import PostCommentCard from './CommentCard';
 import { Avatar, Button, Spinner, useToast } from '@chakra-ui/react';
 import './index.scss';
 

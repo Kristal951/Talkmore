@@ -5,65 +5,76 @@ import { FaUserCircle } from "react-icons/fa";
 import { Avatar, AvatarBadge } from "@chakra-ui/react";
 import useUserStatus from "../../hooks/useUserStatus";
 import moment from "moment";
+import { useNavigate, useParams } from "react-router-dom";
 
 const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
   const { channel: activeChannel, client } = useChatContext();
-  const members = Object.values(channel.state.members).filter(({ user }) => user.id !== client.userID);
+  const members = Object.values(channel.state.members).filter(
+    ({ user }) => user.id !== client.userID
+  );
+  const { cid } = useParams();
+  // const [types, id] = cid?.split(":");
+  // console.log(types, id)
   const userID = members[0]?.user?.id || null;
   const isOnline = useUserStatus(userID);
+  const navigate = useNavigate()
 
-  if (!members.length) return null;
-
-  const lastActive = members[0]?.user?.last_active;
-  const currentTime = moment();
-  const givenTime = moment(lastActive);
-  const hoursDiff = currentTime.diff(givenTime, "hours");
-
-  let lastSeen = "Active now";
-  if (!isOnline) {
-    if (hoursDiff >= 24) {
-      lastSeen = `${currentTime.diff(givenTime, "days")} day(s) ago`;
-    } else if (hoursDiff >= 1) {
-      lastSeen = `${hoursDiff} hour(s) ago`;
-    } else {
-      lastSeen = `${currentTime.diff(givenTime, "minutes")} minute(s) ago`;
-    }
-  }
+  const latestMessage = channel.state.messages?.slice(-1)[0] || null;
+  const latestMessageText = latestMessage?.text || " ";
+  const latestMessageAt = latestMessage?.created_at || null;
+  const formattedDate = latestMessageAt
+    ? moment(latestMessageAt).format("hh:mm A")
+    : "";
 
   const isActive = channel.id === activeChannel?.id;
   const channelImage = channel.data.image;
 
   const handleClick = () => {
-    setActiveChannel(channel); // Directly set the active channel
+    setActiveChannel(channel); 
+    // navigate(`/chat/channel/${channel.cid}`)
   };
 
   const TeamPreview = () => (
     <div
-      className={`flex items-center space-x-3 px-3 py-2 w-full ${
-        isActive ? "bg-gray-100 border-l-2 border-blue-600 dark:bg-darkBackground2" : ""
-      } hover:bg-darkBackground2`}
+      className={`flex items-center space-x-2 px-2 py-2 w-full ${
+        isActive
+          ? "bg-gray-200 border-l-2 border-primary dark:border-white dark:bg-darkBackground2"
+          : ""
+      } dark:hover:bg-darkBackground2 hover:bg-gray-200`}
     >
       {channelImage ? (
-        <img src={channelImage} alt="Channel Avatar" className="w-10 h-10 rounded-full" />
+        <img
+          src={channelImage}
+          alt="Channel Avatar"
+          className="w-10 h-10 rounded-full"
+        />
       ) : (
-        <RiGroup2Fill size={40} className={`${isActive ? "text-blue-600" : "text-gray-600"}`} />
+        <RiGroup2Fill
+          size={40}
+          className={`${isActive ? "text-blue-600" : "text-gray-600"}`}
+        />
       )}
-      <div className="flex flex-col">
-        <p className="font-semibold truncate">{channel?.data?.name || "Unnamed Channel"}</p>
-        {channel.state.unreadCount > 0 && (
-          <span className="absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {channel.state.unreadCount}
-          </span>
-        )}
+      <div className="flex flex-row justify-between flex-1">
+        <div className="flex flex-col">
+          <p className="font-semibold truncate">
+            {channel?.data?.name || "Unnamed Channel"}
+          </p>
+          <p className="text-sm text-gray-500 truncate w-[180px]">{latestMessageText}</p>
+        </div>
+        <div className="flex">
+          <span className="text-xs text-gray-400">{formattedDate}</span>
+        </div>
       </div>
     </div>
   );
 
   const DirectPreview = () => (
     <div
-      className={`flex items-center space-x-3 px-3 py-2 w-full ${
-        isActive ? "bg-gray-100 border-l-2 border-blue-600 dark:bg-darkBackground2" : ""
-      }  hover:bg-darkBackground2`}
+      className={`flex items-center space-x-2 px-3 py-2 w-full ${
+        isActive
+          ? "bg-gray-200 border-l-2 border-primary dark:border-white dark:bg-darkBackground2"
+          : ""
+      } dark:hover:bg-darkBackground2 hover:bg-gray-200`}
     >
       {members[0]?.user?.image ? (
         <Avatar src={members[0]?.user?.image} size="md">
@@ -72,21 +83,26 @@ const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
       ) : (
         <FaUserCircle className="w-10 h-10 text-gray-600" />
       )}
-      <div className="flex flex-col">
-        <p className="font-semibold truncate">{members[0]?.user?.name || "Anonymous User"}</p>
-        {!isOnline && <p className="text-sm text-gray-500">{lastSeen}</p>}
-        {channel.state.unreadCount > 0 && (
-          <span className="absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {channel.state.unreadCount}
-          </span>
-        )}
+
+      <div className="flex flex-row justify-between flex-1">
+        <div className="flex flex-col">
+          <p className="font-semibold truncate">
+          {members[0]?.user?.name || "Anonymous User"}
+          </p>
+          <p className="text-sm text-gray-500 truncate flex-1">{latestMessageText}</p>
+        </div>
+        <div className="flex">
+          <span className="text-xs text-gray-400">{formattedDate}</span>
+        </div>
       </div>
     </div>
   );
 
   return (
     <div
-      className={`flex w-full cursor-pointer hover:bg-gray-100 rounded-md ${isActive ? "bg-gray-200" : ""}`}
+      className={`flex w-full  cursor-pointer hover:bg-darkBackground rounded-md ${
+        isActive ? "bg-gray-200" : ""
+      }`}
       onClick={handleClick}
     >
       {type === "team" ? <TeamPreview /> : <DirectPreview />}

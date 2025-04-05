@@ -7,7 +7,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#2563eb",
+        primary: "#41cc69",
+        // primary: "#2563eb",
         darkBackground: "#212121e6",
         darkBackground2: "#2d2d2d",
       },
@@ -15,5 +16,6 @@ module.exports = {
   },
   plugins: [
     require('tailwind-scrollbar'),
+    require('@tailwindcss/aspect-ratio'),
   ],
 }

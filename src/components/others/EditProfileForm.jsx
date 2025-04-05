@@ -105,7 +105,7 @@ const EditProfileForm = () => {
   };
 
   return (
-    <Box w="full" h="100vh" p={6} bg="gray.50" display="flex" overflowY="scroll" alignItems="center" justifyContent="center">
+    <Box w="full" h="100vh" p={6} bg="gray.50" _dark={{backgroundColor:"#212121e6"}} display="flex" overflowY="scroll" alignItems="center" justifyContent="center" margin="2">
       <VStack
         bg="white"
         p={8}
@@ -113,6 +113,7 @@ const EditProfileForm = () => {
         borderRadius="md"
         boxShadow="md"
         w={["100%", "80%", "50%", "40%"]}
+        _dark={{backgroundColor:"#2d2d2d"}}
       >
         <Heading size="lg" mb={4}>Edit Profile</Heading>
         

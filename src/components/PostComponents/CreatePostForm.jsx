@@ -127,16 +127,16 @@ const CreatePostForm = () => {
   });
 
   return (
-    <div className="w-full h-full bg-black bg-opacity-40 flex items-center justify-center">
-      <div className="bg-white w-[50%] h-[98%] rounded-md shadow-lg p-4">
+    <div className="w-full h-full dark:bg-darkBackground2 ">
+      <div className="bg-white w-full h-screen p-2 dark:bg-darkBackground">
         <form
           onSubmit={createNewPost}
-          className="w-full h-full flex flex-col gap-6 relative"
+          className="w-[60%] h-full flex flex-col gap-6 relative overflow-y-scroll"
         >
           <Textarea
             placeholder="Caption"
-            size="md"
-            rows={3}
+            size="lg"
+            rows={6}
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
           />
@@ -148,7 +148,7 @@ const CreatePostForm = () => {
             }`}
           >
             <input {...getInputProps()} aria-label="Upload File" />
-            <div className="w-full h-full rounded-md flex items-center flex-col justify-start border-[1px]">
+            <div className="w-[50%] h-full rounded-md flex items-center flex-col justify-start border-[1px]">
               {imagePreview ? (
                 fileType === "image" ? (
                   <div className="w-full h-[85%] flex flex-col justify-center items-center rounded-lg">
@@ -186,7 +186,7 @@ const CreatePostForm = () => {
             </div>
           </div>
 
-          <div className="gap-3 flex flex-col w-full h-max">
+          <div className="gap-3 flex flex-col w-[80%] h-max">
             <Input
               variant="filled"
               placeholder="Tags"

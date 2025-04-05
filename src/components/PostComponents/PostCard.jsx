@@ -1,48 +1,34 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { FaTrash, FaCommentAlt } from "react-icons/fa";
 import { UserContext } from "../../Contexts/UserContext";
-import { deletePost, likePost } from "../../lib/AppriteFunction";
 import {
-  useToast,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverFooter,
-  Button,
-  PopoverArrow,
-  PopoverCloseButton,
-  Avatar,
-  AvatarBadge,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Box,
-  Text,
-  Image,
-  IconButton,
-  Tag,
-} from "@chakra-ui/react";
+  deletePost,
+  handleDownload,
+  likePost,
+} from "../../lib/AppriteFunction";
+import { Avatar, AvatarBadge, useToast } from "@chakra-ui/react";
 import moment from "moment";
 import { Link, useNavigate } from "react-router-dom";
 import useUserStatus from "../../hooks/useUserStatus";
-import unStarred from "../../assets/icons/unStarred.svg";
-import Starred from "../../assets/icons/starred.svg";
+import unStarred from "../../assets/icons/unStarred.gif";
 import "./index.scss";
+import Starred from "../../assets/icons/Starred.gif";
+import { FiDownload } from "react-icons/fi";
 
 const PostCard = ({ post, onDelete }) => {
+  const { userDetails = {} } = useContext(UserContext); // Ensure userDetails is defined
   const [loading, setLoading] = useState(false);
-  const [likes, setLikes] = useState(post?.likes.map((user) => user.$id) || []);
+  const [likes, setLikes] = useState(
+    post?.likes?.map((user) => user.$id) || []
+  );
   const [isLiked, setIsLiked] = useState(false);
-  const { userDetails } = useContext(UserContext);
   const toast = useToast();
   const navigate = useNavigate();
   const videoRef = useRef(null);
-  const userId = userDetails?.id;
   const isOnline = useUserStatus(post.creator.$id);
-  console.log(post)
+  const userId = userDetails?.id;
+
+  console.log(post);
 
   useEffect(() => {
     setIsLiked(likes.includes(userId));
@@ -50,18 +36,46 @@ const PostCard = ({ post, onDelete }) => {
 
   const getTimeAgo = (createdAt) => moment(createdAt).fromNow();
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: [0.5] }
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.unobserve(video);
+    };
+  }, []);
+
   const handleLikePost = async (e) => {
     e.stopPropagation();
-    const updatedLikes = likes.includes(userId)
+    if (!userId) return;
+
+    const updatedLikes = isLiked
       ? likes.filter((id) => id !== userId)
       : [...likes, userId];
+
     setLikes(updatedLikes);
-    setIsLiked(!isLiked); // Optimistic UI update
+    setIsLiked(!isLiked);
 
     try {
       await likePost(post.$id, updatedLikes);
     } catch (error) {
       console.error("Error updating likes:", error);
+      setLikes(
+        isLiked ? [...likes, userId] : likes.filter((id) => id !== userId)
+      );
       toast({
         title: "Error",
         description: "Unable to update likes.",
@@ -72,8 +86,21 @@ const PostCard = ({ post, onDelete }) => {
     }
   };
 
+  // const handleDownload = (fileUrl) => {
+  //   if (!fileUrl) return;
+  //   const link = document.createElement("a");
+  //   link.href = fileUrl;
+  //   link.setAttribute("download", ""); // This triggers the download
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
+
   const handleDeletePost = async () => {
+    if (!userId) return;
     setLoading(true);
+    const prevPosts = [...likes];
+
     try {
       await deletePost(post);
       onDelete(post.$id);
@@ -86,6 +113,7 @@ const PostCard = ({ post, onDelete }) => {
       });
     } catch (error) {
       console.error("Error deleting post:", error);
+      setLikes(prevPosts);
       toast({
         title: "Error",
         description: "Unable to delete post.",
@@ -102,171 +130,129 @@ const PostCard = ({ post, onDelete }) => {
     navigate(`/post/${post.$id}/comments`);
   };
 
+  const navigateToPostDetails = () => {
+    navigate(`/post/${post.$id}/details`);
+  };
+
   return (
-    <Card
-      className="post-card"
-      boxShadow="lg"
-      borderRadius="lg"
-      p={2}
-      m={2}
-      width={{md:"60%", sm:"100%"}}
-    
-    >
-      {/* Post Header */}
-      <CardHeader
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Box display="flex" alignItems="center" gap={4}>
-          <Link to={`/profile/${post.creator.$id}`}>
-            <Avatar src={post.creator.imgURL} size="md">
-              {isOnline && <AvatarBadge boxSize="1.25em" bg="green.500" />}
-            </Avatar>
-          </Link>
-          <Box>
-            <Link to={`/profile/${post.creator.$id}`}>
-              <Text fontWeight="bold">{post.creator.name}</Text>
-              <Text fontSize="sm" color="gray.500">
-                {post.creator.tag}
-              </Text>
-            </Link>
-          </Box>
-        </Box>
-        <Text fontSize="sm" color="gray.500">
-          {getTimeAgo(post.$createdAt)}
-        </Text>
-      </CardHeader>
-
-      {/* Post Media and Content */}
-      <CardBody p={1}>
-        {post.mimeType?.includes("image") && post.imgURL ? (
-          <Image
-            src={post.imgURL}
-            alt="Post Media"
-            borderRadius="lg"
-            objectFit="cover"
-            w="full"
-            h="300px"
-          />
-        ) : post.mimeType?.includes("video") && post.vidURL ? (
-          <Box
-            as="video"
-            ref={videoRef}
-            controls
-            w="full"
-            h="300px"
-            objectFit="cover"
-            borderRadius="lg"
+    <div onClick={navigateToPostDetails} className="flex ml-2 rounded-t-lg flex-row w-[100%] hover:bg-gray-50 cursor-pointer md:w-[50%] max-h-max p-4 bg-white border-b-[1px] dark:bg-darkBackground">
+      {/* Avatar Section */}
+      <div className="flex w-[70px] items-start justify-center h-full">
+        <Link to={`/profile/${post.creator.$id}`}>
+          <Avatar
+            src={post.creator.imgURL || "/default-avatar.png"}
+            alt={`${post.creator.name}'s profile`}
           >
-            <source src={post.vidURL} type="video/mp4" />
-            Your browser does not support the video tag.
-          </Box>
-        ) : (
-          <Text fontStyle="italic" color="gray.500">
-            Media not available
-          </Text>
-        )}
+            {isOnline && <AvatarBadge boxSize="1em" bg="green.500" />}
+          </Avatar>
+        </Link>
+      </div>
 
-        <Text mt={4} fontSize="xl" fontWeight="semibold">
-          {post.caption}
-        </Text>
-        <Text mt={2} color="gray.700">
-          {post.description}
-        </Text>
+      {/* Post Content */}
+      <div className="flex w-full h-max flex-col">
+        {/* User Info */}
+        <Link
+          to={`/profile/${post.creator.$id}`}
+          className="flex flex-row items-center gap-2"
+        >
+          <h2 className="text-primary font-bold">{post.creator.name}</h2>
+          <p className="text-green-300 dark:opacity-50">@{post.creator.tag}</p>
+          <span className="text-green-300 dark:opacity-50">•</span>
+          <p className="text-green-300 dark:opacity-50">
+            {getTimeAgo(post.$createdAt)}
+          </p>
+        </Link>
 
-        {/* Tags */}
-        {post.tags?.length > 0 && (
-          <Box mt={4} display="flex" flexWrap="wrap" gap={2}>
-            {post.tags.map((tag, idx) => (
-              <Tag key={idx} colorScheme="gray">
-                #{tag}
-              </Tag>
-            ))}
-          </Box>
-        )}
-      </CardBody>
+        <div className="flex w-full mt-3 gap-2 h-max flex-col">
+          <div className="flex">
+            <h1 className="capitalize text-primary text-xl">{post.caption}</h1>
+          </div>
 
-      {/* Post Footer */}
-      <CardFooter
-        display="flex"
-        justifyContent="flex-end"
-        alignItems="center"
-        p={1}
-      >
-        <Box display="flex" alignItems="center" gap={4}>
-          <Box
-            display="flex"
-            alignItems="center"
-            bgColor="gray.100"
-            padding="1"
-            gap="1"
-            borderRadius="md"
-          >
-            <IconButton
-              onClick={handleLikePost}
-              icon={
+          {/* Post Media */}
+          <div className="max-w-auto max-h-auto">
+            {post.mimeType?.includes("image") && post.imgURL ? (
+              <div className="flex aspect-w-2 aspect-h-2">
                 <img
-                  src={isLiked ? Starred : unStarred}
-                  alt="Like Button"
-                  className="w-8 h-8"
+                  src={post.imgURL}
+                  alt="Post Media"
+                  className="rounded-lg object-cover"
+                  loading="lazy"
                 />
-              }
-              aria-label="Like post"
-              variant="ghost"
-              padding="1"
-            />
-            <Text>{likes.length}</Text>
-          </Box>
+              </div>
+            ) : post.mimeType?.includes("video") && post.vidURL ? (
+              <div className="flex aspect-w-2 aspect-h-2">
+                <video
+                  ref={videoRef}
+                  controls
+                  preload="metadata"
+                  autoPlay
+                  loop
+                  playsInline
+                  className="rounded-lg object-cover"
+                >
+                  <source src={post.vidURL} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : (
+              <p className="text-gray-500">Media not available</p>
+            )}
+          </div>
+        </div>
 
-          <Box
-            display="flex"
-            alignItems="center"
-            bgColor="gray.100"
-            padding="1"
-            gap="1"
-            borderRadius="md"
+        {/* Post Actions */}
+        <div className="flex flex-row items-center justify-between h-max mt-3 gap-4">
+          {/* Like Button */}
+          <button
+            onClick={handleLikePost}
+            className="flex items-center justify-center bg-opacity-10 p-1 rounded-lg dark:hover:bg-yellow-50 hover:bg-yellow-100 text-gray-600 dark:text-gray-300 gap-[3px]"
           >
-            <IconButton
-              onClick={navigateToComments}
-              icon={<FaCommentAlt className="w-6 h-6 text-[#2563eb]" />}
-              aria-label="Comment on post"
-              variant="ghost"
-            />
-            <Text>{post?.comments.length}</Text>
-          </Box>
-
+            {isLiked ? (
+              <img
+                src={Starred}
+                alt="Like"
+                className="w-6 h-6 object-contain"
+                loading="lazy"
+              />
+            ) : (
+              <img
+                src={unStarred}
+                alt="Like"
+                className="w-6 h-6 object-contain"
+                loading="lazy"
+              />
+            )}
+            <span className={isLiked ? "text-yellow-300" : ""}>
+              {likes.length}
+            </span>
+          </button>
+          {/* Comment Button */}
+          <button
+            onClick={navigateToComments}
+            className="flex flex-row gap-[5px] items-center p-1 h-max w-max text-primary rounded-lg dark:hover:bg-green-50 hover:bg-green-100 justify-center bg-opacity-10 dark:bg-opacity-5"
+          >
+            <FaCommentAlt className="w-[1.2rem] h-[1.2rem]" />
+            <span>{post.comments?.length || 0}</span>
+          </button>
+          <button
+            onClick={() => handleDownload(post.fileID)}
+            className="flex flex-row gap-[5px] items-center p-1 h-max w-max text-primary rounded-lg dark:hover:bg-green-50 hover:bg-green-100 justify-center bg-opacity-10 dark:bg-opacity-5"
+          >
+            <FiDownload className="w-[1.2rem] h-[1.2rem]" />
+          </button>
+          {/* Delete Button (Only for Post Owner) */}
           {userId === post.creator.$id && (
-            <Popover>
-              <PopoverTrigger>
-                <IconButton
-                  icon={<FaTrash className="w-6 h-6 text-[#2563eb]" />}
-                  aria-label="Delete post"
-                  variant="ghost"
-                />
-              </PopoverTrigger>
-              <PopoverContent>
-                <PopoverArrow />
-                <PopoverCloseButton />
-                <PopoverHeader>Confirmation</PopoverHeader>
-                <PopoverBody>
-                  Are you sure you want to delete this post?
-                </PopoverBody>
-                <PopoverFooter>
-                  <Button
-                    onClick={handleDeletePost}
-                    colorScheme="red"
-                    isLoading={loading}
-                  >
-                    Delete
-                  </Button>
-                </PopoverFooter>
-              </PopoverContent>
-            </Popover>
+            <button
+              onClick={handleDeletePost}
+              disabled={loading}
+              className="text-red-500"
+            >
+              <FaTrash />
+            </button>
           )}
-        </Box>
-      </CardFooter>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 };
 

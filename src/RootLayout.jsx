@@ -7,10 +7,9 @@ import { Chat } from "stream-chat-react";
 import { Spinner, useColorMode } from "@chakra-ui/react";
 import "./index.scss";
 import { IoMenuSharp } from "react-icons/io5";
-
 import { MdOutlineCancel } from "react-icons/md";
 import MobileNav from "./components/others/MobileNav";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 const RootLayout = () => {
   const { setUserDetails } = useContext(UserContext);
@@ -20,9 +19,9 @@ const RootLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
   const { colorMode, toggleColorMode } = useColorMode();
 
+  // Update the color mode for the app
   useEffect(() => {
     const root = window.document.documentElement;
     if (colorMode === "dark") {
@@ -31,8 +30,6 @@ const RootLayout = () => {
       root.classList.remove("dark");
     }
   }, [colorMode]);
-
-  console.log(colorMode)
 
   const Logout = () => {
     localStorage.clear();
@@ -57,9 +54,15 @@ const RootLayout = () => {
     if (!token) {
       return navigate("/Login");
     }
+
     if (token) {
-      const decodedToken = jwtDecode(token);
-      if (decodedToken.exp * 1000 < Date.now()) {
+      try {
+        const decodedToken = jwtDecode(token);
+        if (decodedToken.exp * 1000 < Date.now()) {
+          Logout();
+        }
+      } catch (err) {
+        console.error("Invalid token:", err);
         Logout();
       }
     }
@@ -88,7 +91,7 @@ const RootLayout = () => {
     if (error) {
       console.error("Chat client error:", error);
     }
-  }, [isClientReady, chatClient, error, navigate, setUserDetails]);
+  }, []);
 
   if (error) {
     return (
@@ -99,7 +102,7 @@ const RootLayout = () => {
     );
   }
 
-  if (!isClientReady) {
+  if (!isClientReady && !chatClient) {
     return (
       <div className="w-full h-screen flex items-center justify-center dark:bg-darkBackground">
         <Spinner size="lg" />
@@ -126,7 +129,7 @@ const RootLayout = () => {
 
         <Sidebar />
 
-        <section className="flex flex-1 h-full section ml-[70px] overflow-hidden dark:bg-darkBackground">
+        <section className="flex flex-1 h-full section ml-[20%] overflow-hidden dark:bg-darkBackground">
           <Outlet />
         </section>
       </div>

@@ -1,6 +1,8 @@
 import React from "react";
 import ThemeToggle from "../components/others/ThemeToggle";
 import FontSizeSettings from "../components/others/FontSizeSettings";
+import { FaRegTrashAlt } from "react-icons/fa";
+import Index from "../components/SettingsComponents/Appearence/Index";
 
 const Settings = () => {
   return (
@@ -14,17 +16,18 @@ const Settings = () => {
 
       {/* Settings Sections */}
       <main className="flex w-full h-full flex-col gap-4">
+      
+        <Index/>
         <section className="flex flex-col w-2/4 gap-2 p-4 border rounded-md bg-white dark:bg-darkBackground2 shadow-sm">
-          <h2 className="text-xl font-bold text-primary mb-4 dark:text-white">Appearance</h2>
-
+          <h2 className="text-xl font-bold text-primary mb-4 dark:text-white">
+            Account
+          </h2>
           <div className="flex items-center justify-between">
-            <span className="text-lg">Theme</span>
-            <ThemeToggle />
+            <span className="text-lg">Delete Account</span>
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-lg">Font Size</span>
-            <FontSizeSettings />
+          <div>
+            <span></span>
           </div>
         </section>
       </main>

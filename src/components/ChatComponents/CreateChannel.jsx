@@ -118,7 +118,7 @@ const CreateChannel = ({ createType, setIsCreating }) => {
   };
 
   return (
-    <div className="w-full h-screen dark:bg-darkBackground bg-white overflow-y-scroll ">
+    <div className="w-[73vw] h-screen dark:bg-darkBackground bg-white overflow-y-scroll ">
       <div className="flex items-center dark:bg-darkBackground2 justify-between p-4 shadow-md bg-white z-50 ">
         <p className="capitalize font-bold text-xl text-blue-600 dark:text-white">
           {createType === "team" ? "Create a new channel" : "Send a direct message"}

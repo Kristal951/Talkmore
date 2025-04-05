@@ -20,6 +20,9 @@ import Search from './pages/Search'
 import CreateChannel from './components/ChatComponents/CreateChannel'
 import Index from './components/Notifications/Index'
 import Settings from './pages/Settings'
+import PostCard from './components/PostComponents/PostCard'
+import NotFound from './pages/NotFound'
+import PostDetails from './components/PostComponents/PostDetails'
 
 const App = () => {
   return (
@@ -37,8 +40,11 @@ const App = () => {
                   <Route index element={<Home/>}/>
                   <Route path='/CreatePost' element={<CreatePostForm/>}/>
                   <Route path='/Chat' element={<ChatScreen/>}/>
+                  <Route path='/Chat/channel/:cid' element={<ChatScreen/>}/>
                   <Route path='/Chat/createChannel' element={<CreateChannel/>}/>
                   <Route path="/post/:postId/comments" element={<PostComments />} />
+                  <Route path="/post/:postId/details" element={<PostDetails />} />
+                  <Route path="/post/:postId" element={<PostCard />} />
                   <Route path="/profile/:userID" element={<Profile/>} />
                   <Route path="/VideoCall/:callID" element={<VideoCallScreen/>} />
                   <Route path="/AudioCall/:callID" element={<AudioCallScreen/>} />
@@ -47,6 +53,7 @@ const App = () => {
                   <Route path="/Profile/notifications/:userId" element={<Index/>} />
                   <Route path="/Search/results" element={<Search/>} />
                   <Route path="/Settings" element={<Settings />} />
+                  <Route path="/*" element={<NotFound />} />
                 </Route>
               </Routes>
             </Router>
