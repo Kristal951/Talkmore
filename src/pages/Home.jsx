@@ -50,9 +50,9 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="w-full h-screen dark:bg-darkBackground relative">
+    <div className="w-[55%] border-r-[1px] border-primary h-screen dark:bg-darkBackground relative">
       {/* Header Section */}
-      <div className="w-[80%] h-[60px] p-2 right-0 shadow-md gap-6 bg-white dark:bg-darkBackground2 border-0 bg-opacity-10 backdrop-blur-sm border-[rgba(255,255,255,0.18)] flex fixed items-center flex-row top-0 z-[9000]">
+      {/* <div className="w-[52%] h-[60px] p-2 left-[20%] shadow-md gap-6 bg-white dark:bg-darkBackground2 border-0 bg-opacity-10 backdrop-blur-sm border-[rgba(255,255,255,0.18)] flex fixed items-center flex-row top-0 z-[9000]">
         <div className="flex right-40 items-center justify-center absolute">
           <Button colorScheme="blue" variant="solid" onClick={() => navigate("/CreatePost")}>
             Create A Post
@@ -66,10 +66,10 @@ const Home = () => {
             title={userDetails?.name}
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
-      <div className="w-full h-screen flex flex-col items-start justify-start overflow-y-auto pt-[70px]">
+      <div className="w-full h-screen flex flex-col items-start justify-start overflow-y-auto scrollbar-none pt-[70px]">
         {error && (
           <div className="flex flex-col h-full w-full items-center justify-center text-red-500">
             <p>Something went wrong, please try again</p>
@@ -97,7 +97,7 @@ const Home = () => {
         )}
 
         {!loading && posts.length > 0 && (
-          <div className="flex flex-col w-full items-start gap-4">
+          <div className="flex flex-col w-full items-start">
             {posts.map((post) => (
               <PostCard key={post.$id} post={post} onDelete={handleDelete} />
             ))}
@@ -105,6 +105,7 @@ const Home = () => {
         )}
       </div>
 
+        
       {searching && <Search setSearching={setSearching} />}
     </div>
   );

@@ -129,7 +129,7 @@ const RootLayout = () => {
 
         <Sidebar />
 
-        <section className="flex flex-1 h-full section ml-[20%] overflow-hidden dark:bg-darkBackground">
+        <section className="flex flex-1 h-full section ml-[25%] overflow-hidden dark:bg-darkBackground">
           <Outlet />
         </section>
       </div>

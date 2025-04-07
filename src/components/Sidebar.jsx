@@ -42,7 +42,7 @@ const Sidebar = () => {
 
   return (
     <>
-    <div className='w-[20%] h-screen bg-white dark:bg-darkBackground2 p-6 transition-colors fixed border-r-[1px] border-primary flex flex-col'>
+    <div className='w-[25%] h-screen bg-white dark:bg-darkBackground2 p-6 transition-colors fixed border-r-[1px] border-primary flex flex-col'>
       <div className="flex flex-col w-full items-start h-full gap-4 relative pt-6 p-2">
         <NavLink 
           to='/' 

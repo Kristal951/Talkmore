@@ -135,7 +135,7 @@ const PostCard = ({ post, onDelete }) => {
   };
 
   return (
-    <div onClick={navigateToPostDetails} className="flex ml-2 rounded-t-lg flex-row w-[100%] hover:bg-gray-50 cursor-pointer md:w-[50%] max-h-max p-4 bg-white border-b-[1px] dark:bg-darkBackground">
+    <div onClick={navigateToPostDetails} className="flex rounded-t-lg flex-row w-[100%] hover:bg-gray-50 cursor-pointer md:w-[100%] max-h-max p-4 bg-white border-b-[1px] dark:bg-darkBackground">
       {/* Avatar Section */}
       <div className="flex w-[70px] items-start justify-center h-full">
         <Link to={`/profile/${post.creator.$id}`}>
