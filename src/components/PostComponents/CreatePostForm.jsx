@@ -5,6 +5,7 @@ import UploadFile from "../../assets/icons/file-upload.svg";
 import { createPost } from "../../lib/AppriteFunction";
 import { UserContext } from "../../Contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import TextareaAutosize from "react-textarea-autosize";
 
 const CreatePostForm = () => {
   const [postFile, setPostFile] = useState(null);
@@ -133,10 +134,10 @@ const CreatePostForm = () => {
           onSubmit={createNewPost}
           className="w-[60%] h-full flex flex-col gap-6 relative overflow-y-scroll"
         >
-          <Textarea
+          <TextareaAutosize
             placeholder="Caption"
-            size="lg"
-            rows={6}
+            className="w-full h-max p-2 rounded-md border-[1px] border-gray-300"
+            minrows={6}
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
           />

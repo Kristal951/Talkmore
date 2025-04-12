@@ -1,0 +1,22 @@
+#custom-toolbar {
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    padding: 8px;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .dark{
+    #custom-toolbar{
+      background: rgb(45 45 45);
+      border: 1px solid #41cc69;
+      color:#41cc69,
+    }
+  }
+  
+  .ql-custom-emoji {
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  

@@ -61,7 +61,7 @@ const SignUpUser = async (req, res) => {
             {
                 name,
                 tag,
-                phoneNumber,
+                phone:phoneNumber,
                 passKey: hashedPassword,
                 imgURL: avatarURL,
                 email
@@ -133,9 +133,30 @@ const LoginUser = async (req, res) => {
     }
 };
 
-module.exports = LoginUser;
+const SearchUser = async (req, res) => {
+    const { query } = req.body;
+  
+    // Early return for empty or invalid query
+    if (!query || query.trim().length === 0) {
+      return res.status(400).json({ error: "Search query cannot be empty." });
+    }
+  
+    try {
+      const posts = await databases.listDocuments(
+        "6713a7c9001581fc5175", // your DB ID
+        "6713a7d200190a7a8f52", // your collection ID
+        [Query.contains("name", query)]
+      );
+  
+      return res.status(200).json({ posts });
+    } catch (error) {
+      console.error("SearchUser error:", error);
+      return res.status(500).json({ error: error.message });
+    }
+  };  
 
 module.exports = {
     SignUpUser,
-    LoginUser
+    LoginUser,
+    SearchUser
 };

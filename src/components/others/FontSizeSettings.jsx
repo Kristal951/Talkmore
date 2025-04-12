@@ -26,35 +26,35 @@ const FontSizeSettings = () => {
   };
 
   return (
-    <div className="font-size-settings">
-      <div className="font-size-options">
+    <div className="font-size-settings flex items-center gap-4 p-2 bg-gray-100 dark:bg-opacity-25 dark:bg-primary rounded-lg shadow-md">
+      <div className="font-size-options flex gap-4">
         <button
           onClick={() => handleFontSizeChange("small")}
-          className={
+          className={`px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 border-2 ${
             fontSize === "small"
-              ? "active"
-              : " rounded-lg dark:bg-darkBackground dark:border-0 dark:text-white border-primary border-[1px]"
-          }
+              ? "bg-primary text-white border-primary"
+              : "bg-gray-200 text-gray-800 dark:border-[1px] dark:border-primary border-transparent hover:bg-gray-300 dark:bg-transparent dark:text-white dark:hover:bg-gray-500"
+          }`}
         >
           Small
         </button>
         <button
           onClick={() => handleFontSizeChange("medium")}
-          className={
+          className={`px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 border-2 ${
             fontSize === "medium"
-              ? "active"
-              : " rounded-lg dark:bg-darkBackground dark:border-0 dark:text-white border-primary border-[1px]"
-          }
+              ? "bg-primary text-white border-primary"
+              : "bg-gray-200 text-gray-800 dark:border-[1px] dark:border-primary border-transparent hover:bg-gray-300 dark:bg-transparent dark:text-white dark:hover:bg-gray-500"
+          }`}
         >
           Medium
         </button>
         <button
           onClick={() => handleFontSizeChange("large")}
-          className={
+          className={`px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 border-[1px] ${
             fontSize === "large"
-              ? "active"
-              : " rounded-lg dark:bg-darkBackground dark:border-0 dark:text-white border-primary border-[1px]"
-          }
+              ? "bg-primary text-white border-primary"
+              : "bg-gray-200 text-gray-800 dark:border-[1px] dark:border-primary border-transparent hover:bg-gray-300 dark:bg-transparent dark:text-white dark:hover:bg-gray-500"
+          }`}
         >
           Large
         </button>

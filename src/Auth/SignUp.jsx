@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "react-phone-number-input/style.css";
 import axios from "axios";
 import { useToast, Spinner, Input } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import Slide from "./Slide";
+import emailjs from "@emailjs/browser";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -15,15 +16,29 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
 
   const userPayload = {
-    name,
-    tag,
-    email,
-    phoneNumber,
+    name: name.trim(),
+    tag: tag.trim(),
+    email: email.trim(),
+    phoneNumber: phoneNumber.trim(),
     password,
   };
+  
 
   const toast = useToast();
   const navigate = useNavigate();
+  const form = useRef();
+
+  const sendWelcomeMsg = async (e) => {
+    try {
+      const res = await emailjs.sendForm("service_p6kig1e", "template_60eh2y9", form.current, {
+        publicKey: "Si4-o4VjXbVTtgTtR",
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,6 +96,8 @@ const SignUp = () => {
           position: "top-right",
         });
 
+        await sendWelcomeMsg()
+
         const { createdUser, appwritePayload, jwtToken } = res.data;
         localStorage.setItem("streamPayload", JSON.stringify(createdUser));
         localStorage.setItem(
@@ -116,25 +133,29 @@ const SignUp = () => {
       </div>
       <div className="form-container w-[50%] h-screen p-8 bg-white flex-col justify-center rounded-lg items-center flex">
         <form
+          ref={form}
           onSubmit={handleSubmit}
           className="flex flex-col gap-8 items-center justify-center w-[80%] h-full"
         >
           <fieldset className="border border-blue-500 w-full h-max p-2 items-center rounded-lg justify-center flex flex-col gap-6 px-3">
-            <legend className="text-3xl font-bold text-blue-500">Register</legend>
+            <legend className="text-3xl font-bold text-blue-500">
+              Register
+            </legend>
             <Input
               variant="filled"
               type="text"
-              placeholder="Your Full Name"
+              placeholder="Name"
               className=" border-black border-[1px] p-2 rounded-md"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              name="user_name"
               aria-required="true"
             />
             <Input
               variant="filled"
               type="tel"
-              placeholder="Your Phone Number"
+              placeholder="Phone Number"
               className="border-black border-[1px] p-2 rounded-md"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
@@ -144,17 +165,18 @@ const SignUp = () => {
             <Input
               variant="filled"
               type="email"
-              placeholder="Your Email"
+              placeholder="Email"
               className="border-black border-[1px] p-2 rounded-md"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              name="user_email"
               aria-required="true"
             />
             <Input
               variant="filled"
               type="text"
-              placeholder="Your Tag"
+              placeholder="Tag"
               className="border-black border-[1px] p-2 rounded-md"
               value={tag}
               onChange={(e) => setTag(e.target.value)}
@@ -187,7 +209,9 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className="w-full bg-black h-[50px] hover:bg-transparent hover:text-black hover:border-black hover:border-[1px] cursor-pointer rounded-lg text-white flex items-center justify-center"
+            className={`w-full bg-black h-[50px] hover:bg-transparent hover:text-black hover:border-black hover:border-[1px] cursor-pointer rounded-lg text-white flex items-center justify-center ${
+              loading ? "opacity-50" : ""
+            }`}            
             disabled={loading}
           >
             {loading ? <Spinner size="md" /> : "Submit"}

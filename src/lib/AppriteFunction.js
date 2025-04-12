@@ -26,7 +26,7 @@ export const uploadFile = async (file) => {
       throw new Error("Error creating post.");
     }
 
-    console.log("Uploaded file details:", uploadedFile); 
+    console.log("Uploaded file details:", uploadedFile);
     return uploadedFile;
   } catch (error) {
     console.error("File upload error:", error.message || error);
@@ -83,17 +83,41 @@ export const getfilePrev = async (fileId) => {
 
 export const createPost = async (post) => {
   try {
-    if (!post || !post.file) {
-      return { message: "Post data or file is missing" };
+    if (!post) {
+      return { message: "Post data is missing" };
     }
 
-    const uploadedFile = await uploadFile(post.file);
+    const file = post.file;
+    const fileType = file?.type;
 
+    // Handle text-only post
+    if (!file && post.mimeType?.startsWith("text/")) {
+      const newPost = await databases.createDocument(
+        "6713a7c9001581fc5175",
+        "6713ac4e0004c0f113e9",
+        ID.unique(),
+        {
+          creator: post.creator,
+          TextContent: post.textContent,
+          mimeType: post.mimeType,
+          // tags: post.tags ? post.tags.replace(/ /g, "").split(",") : [],
+          location: post.location,
+        }
+      );
+      return { message: "Text post created successfully", newPost };
+    }
+
+    // If no file present for image/video
+    if (!file) {
+      return { message: "File is missing for media post." };
+    }
+
+    // Upload file and get URL
+    const uploadedFile = await uploadFile(file);
     const fileUrl = await getFileUrl(uploadedFile.$id);
 
-    const fileType = post.file.type;
-
-    if (fileType && fileType.startsWith("video/")) {
+    // Handle video
+    if (fileType.startsWith("video/")) {
       const newPost = await databases.createDocument(
         "6713a7c9001581fc5175",
         "6713ac4e0004c0f113e9",
@@ -103,7 +127,7 @@ export const createPost = async (post) => {
           caption: post.caption,
           vidURL: fileUrl,
           mimeType: fileType,
-          tags: post.tags ? post.tags.replace(/ /g, "").split(",") : [],
+          // tags: post.tags ? post.tags.replace(/ /g, "").split(",") : [],
           location: post.location,
           fileID: uploadedFile.$id,
         }
@@ -111,22 +135,26 @@ export const createPost = async (post) => {
       return { message: "Video post created successfully", newPost };
     }
 
-    // Handle non-video files (e.g., images)
-    const newPost = await databases.createDocument(
-      "6713a7c9001581fc5175",
-      "6713ac4e0004c0f113e9",
-      ID.unique(), // Unique document ID
-      {
-        creator: post.userId,
-        caption: post.caption,
-        imgURL: fileUrl, // Store image URL
-        mimeType: fileType, // Use post.file.type for MIME type
-        tags: post.tags ? post.tags.replace(/ /g, "").split(",") : [], // Split tags into array (fixed typo)
-        location: post.location, // Ensure you're passing this value in `post`
-        fileID: uploadedFile.$id,
-      }
-    );
-    return { message: "Image post created successfully", newPost };
+    // Handle image
+    if (fileType.startsWith("image/")) {
+      const newPost = await databases.createDocument(
+        "6713a7c9001581fc5175",
+        "6713ac4e0004c0f113e9",
+        ID.unique(),
+        {
+          creator: post.userId,
+          caption: post.caption,
+          imgURL: fileUrl,
+          mimeType: fileType,
+          // tags: post.tags ? post.tags.replace(/ /g, "").split(",") : [],
+          location: post.location,
+          fileID: uploadedFile.$id,
+        }
+      );
+      return { message: "Image post created successfully", newPost };
+    }
+
+    return { message: "Unsupported file type." };
   } catch (error) {
     console.error("Error creating post:", error);
     return { message: error.message || "Internal server error" };
@@ -379,8 +407,8 @@ export const addFriendToDB = async (userId, friendId) => {
 
 export const handleDownload = async (fileId) => {
   try {
-    const fileUrl = storage.getFileDownload('671116b10025310bdc15', fileId);
-    window.location.href = fileUrl; 
+    const fileUrl = storage.getFileDownload("671116b10025310bdc15", fileId);
+    window.location.href = fileUrl;
   } catch (error) {
     console.error("Error downloading file:", error);
   }

@@ -33,6 +33,7 @@ const Profile = () => {
   const { client } = useChatContext();
   const [streamUser, setStreamUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingUserPosts, setLoadingUserPosts] = useState(false);
   const [userPosts, setUserPosts] = useState([]);
   const [error, setError] = useState(null);
   const [isBlocked, setIsBlocked] = useState(false);
@@ -45,15 +46,16 @@ const Profile = () => {
     const getCurrentUserPosts = async () => {
       if (userID) {
         try {
-          setLoading(true);
+          setLoadingUserPosts(true);
           setError(null);
           const posts = await getUserPosts(userID);
           setUserPosts(posts);
+          console.log(posts);
         } catch (err) {
           console.error("Error fetching user posts:", err);
           setError("Failed to load posts. Please try again later.");
         } finally {
-          setLoading(false);
+          setLoadingUserPosts(false);
         }
       }
     };
@@ -69,16 +71,16 @@ const Profile = () => {
         setStreamUser(response.users[0]);
         console.log(response.users[0]);
 
-        console.log('user', client.user)
+        console.log("user", client.user);
 
-        const blockStatus = await client.getBlockedUsers({
-          bannedUserId: userID,
-          userId: client.userID,
-        });
-        setIsBlocked(blockStatus.bans.length > 0);
+        // const blockStatus = await client.getBlockedUsers({
+        //   bannedUserId: userID,
+        //   userId: client.userID,
+        // });
+        // setIsBlocked(blockStatus.bans.length > 0);
       } catch (err) {
         console.error("Error fetching Stream user:", err);
-        setError("Failed to load user details. Please try again later.");
+        // setError("Failed to load user details. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -136,10 +138,7 @@ const Profile = () => {
   };
 
   const userPostCards = useMemo(
-    () =>
-      userPosts.map((post) => (
-        <UserPostCard post={post} key={post.id} />
-      )),
+    () => userPosts.map((post) => <UserPostCard post={post} key={post.id} />),
     [userPosts]
   );
 
@@ -161,40 +160,44 @@ const Profile = () => {
             title={streamUser?.name}
           />
           <div className="flex p-2 flex-col items-center justify-center">
-            <h3 className="text-xl font-bold p-1">{streamUser?.name}</h3>
-            <p className="text-gray-400 text-center">{streamUser?.tag}</p>
+            <h3 className="text-xl font-bold p-1 text-primary">
+              {streamUser?.name}
+            </h3>
+            <p className="text-center text-green-200 text-sm">
+              @{streamUser?.tag}
+            </p>
             <div className="flex items-center justify-center">
-              <p>{streamUser?.bio}</p>
+              <p className="text-primary">{streamUser?.bio}</p>
             </div>
 
             <div
-              className="flex absolute right-6 top-6 w-[40px] h-[40px] cursor-pointer hover:bg-gray-200 hover:rounded-full p-2"
+              className="flex absolute right-6 top-6 w-[40px] h-[40px] cursor-pointer hover:bg-gray-500 hover:rounded-full p-2"
               onClick={() => navigate(`/Profile/edit/${userID}`)}
             >
-              <CiEdit className="w-full h-full" />
+              <CiEdit className="w-full h-full text-primary" />
             </div>
           </div>
         </div>
 
         <Link
           to={`/profile/notifications/${userID}`}
-          className="flex w-[50px] h-[50px] p-2 absolute right-6 top-6 hover:bg-gray-200 rounded-full cursor-pointer"
+          className="flex w-[50px] h-[50px] p-2 absolute right-6 top-6 dark:hover:bg-gray-500 dark:bg-opacity-50 rounded-full cursor-pointer"
         >
-          <IoMdNotificationsOutline className="w-full h-full" />
+          <IoMdNotificationsOutline className="w-full h-full text-primary" />
         </Link>
       </div>
 
       {client.userID !== userID && (
         <div className="w-full p-2 h-max gap-6 justify-center flex">
           <IconButton
-            icon={<MdPersonAddAlt1 className="w-full h-full" />}
+            icon={<MdPersonAddAlt1 className="w-full h-full text-primary" />}
             size="lg"
             p="2"
             aria-label="Add friend button"
             onClick={addFriend}
           />
           <IconButton
-            icon={<MdBlock className="w-full h-full" />}
+            icon={<MdBlock className="w-full h-full text-primary hover:bg-gray-200" />}
             size="lg"
             p="2"
             aria-label={isBlocked ? "Unblock user button" : "Block user button"}
@@ -222,14 +225,23 @@ const Profile = () => {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <div className="flex flex-wrap h-[500px] w-full p-2 gap-8 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray scrollbar-track-gray scrollbar-rounded">
-                {userPosts.length > 0 ? (
-                  userPostCards
-                ) : (
-                  <p>No posts available</p>
-                )}
-              </div>
+              {loadingUserPosts ? (
+                <div className="w-full h-max flex items-center justify-center translate-y-28">
+                  <Spinner size="lg" />
+                </div>
+              ) : userPosts.length > 0 ? (
+                <div className="flex flex-wrap h-[500px] w-full p-2 gap-8 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray scrollbar-track-gray scrollbar-rounded">
+                  {userPostCards}
+                </div>
+              ) : (
+                <div className="flex w-full h-max translate-y-28 items-center justify-center">
+                  <p className="text-primary font-bold text-xl">
+                    No posts available
+                  </p>
+                </div>
+              )}
             </TabPanel>
+
             <TabPanel>
               <p>Starred posts will appear here.</p>
             </TabPanel>
