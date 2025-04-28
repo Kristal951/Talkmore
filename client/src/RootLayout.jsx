@@ -12,7 +12,7 @@ import MobileNav from "./components/others/MobileNav";
 import { jwtDecode } from "jwt-decode";
 
 const RootLayout = () => {
-  const { setUserDetails } = useContext(UserContext);
+  const { userDetails, setUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
   const { chatClient, isClientReady, error, setChatClient } = useChatClientContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -113,26 +113,30 @@ const RootLayout = () => {
   console.log(chatClient)
 
   return (
-    <Chat client={chatClient} theme={`str-chat__theme-${colorMode}`}>
-      <div className="w-full h-screen flex relative dark:bg-darkBackground">
-        <div className="menu-icon cursor-pointer hidden">
-          {isSidebarOpen ? (
-            <MdOutlineCancel size={28} onClick={toggleSidebar} />
-          ) : (
-            <IoMenuSharp size={28} onClick={toggleSidebar} />
-          )}
+    <>
+      {
+        userDetails != null ? <Chat client={chatClient} theme={`str-chat__theme-${colorMode}`}>
+        <div className="w-full h-screen flex relative dark:bg-darkBackground">
+          <div className="menu-icon cursor-pointer hidden">
+            {isSidebarOpen ? (
+              <MdOutlineCancel size={28} onClick={toggleSidebar} />
+            ) : (
+              <IoMenuSharp size={28} onClick={toggleSidebar} />
+            )}
+          </div>
+          <div className="flex w-max h-max">
+            {isSidebarOpen && <MobileNav toggleSidebar={toggleSidebar} />}
+          </div>
+  
+          <Sidebar />
+  
+          <section className="flex flex-1 h-full section ml-[20%] overflow-hidden dark:bg-darkBackground">
+            <Outlet />
+          </section>
         </div>
-        <div className="flex w-max h-max">
-          {isSidebarOpen && <MobileNav toggleSidebar={toggleSidebar} />}
-        </div>
-
-        <Sidebar />
-
-        <section className="flex flex-1 h-full section ml-[20%] overflow-hidden dark:bg-darkBackground">
-          <Outlet />
-        </section>
-      </div>
-    </Chat>
+      </Chat> : <p>loading...</p>
+      }
+    </>
   );
 };
 

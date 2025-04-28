@@ -11,8 +11,8 @@ const Search = ({ setSearching }) => {
   const handleSearch = async (e) => {
     setQuery(e.target.value);
     try {
-      const res = await queryPosts(query);
-      setPosts(res.documents);
+      // const res = await queryPosts(query);
+      // setPosts(res.documents);
     } catch (error) {
       console.error(error);
     }

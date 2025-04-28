@@ -4,14 +4,14 @@ import { UserContext } from "../../Contexts/UserContext";
 import {
   deletePost,
   handleDownload,
-  likePost,
+  toggleLikePost,
 } from "../../lib/AppriteFunction";
 import { Avatar, AvatarBadge, Spinner, useToast } from "@chakra-ui/react";
 import moment from "moment";
 import { Link, useNavigate } from "react-router-dom";
 import useUserStatus from "../../hooks/useUserStatus";
-import unStarred from "../../assets/icons/unStarred.gif";
-import Starred from "../../assets/icons/Starred.gif";
+import unStarred from "../../assets/GIF/unStarred.gif";
+import Starred from "../../assets/GIF/Starred.gif";
 import { FiDownload } from "react-icons/fi";
 import './index.scss';
 
@@ -71,7 +71,7 @@ const PostCard = ({ post, onDelete }) => {
     setIsLiked(!isLiked);
 
     try {
-      await likePost(post?.$id, updatedLikes);
+      await toggleLikePost(post?.$id, updatedLikes);
     } catch (error) {
       console.error("Error updating likes:", error);
       setLikes(

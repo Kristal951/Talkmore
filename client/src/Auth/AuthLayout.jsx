@@ -1,18 +1,25 @@
-import React from "react";
-import illustration1 from "../assets/illustrations/Social_update_1.mp4";
+import React, { useEffect, useState } from "react";
+import illustration1 from "../assets/GIF/Social update.gif";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const AuthLayout = () => {
   const location = useLocation();
+  const [isSignUp, setIsSignUp] = useState(null);
+
+  useEffect(() => {
+    if (location.pathname === "/Auth/Login") {
+      setIsSignUp(false);
+    } else {
+      setIsSignUp(false);
+    }
+  }, []);
 
   return (
-    <div className="flex w-full h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 overflow-hidden">
+    <div className="flex w-full dark:bg-darkBackground2 h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 overflow-hidden">
       {/* Left Video Panel */}
-      <div className="hidden md:flex flex-1">
-        <video autoPlay loop muted className="w-full h-full object-cover">
-          <source src={illustration1} type="video/mp4" />
-        </video>
+      <div className="hidden md:hidden lg:flex flex-1">
+        <img src={illustration1} className="w-full h-full" alt="" animation />
       </div>
 
       {/* Right Form Panel */}
@@ -27,6 +34,7 @@ const AuthLayout = () => {
                   isActive ? "bg-primary text-white shadow-md" : "text-primary"
                 }`
               }
+              onClick={() => setIsSignUp(true)}
             >
               Sign Up
             </NavLink>
@@ -37,6 +45,7 @@ const AuthLayout = () => {
                   isActive ? "bg-primary text-white shadow-md" : "text-primary"
                 }`
               }
+              onClick={() => setIsSignUp(false)}
             >
               Log In
             </NavLink>
@@ -58,14 +67,16 @@ const AuthLayout = () => {
           </div>
 
           {/* Forgot Password */}
-          <div className="mt-4 text-center">
-            <Link
-              to="/ForgotPassword"
-              className="text-sm text-primary underline hover:text-primary-dark transition"
-            >
-              Forgot Password?
-            </Link>
-          </div>
+          {isSignUp === false && (
+            <div className="mt-4 text-center">
+              <Link
+                to="/ForgotPassword"
+                className="text-sm text-primary underline hover:text-primary-dark transition"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

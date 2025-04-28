@@ -9,11 +9,11 @@ import {
   Tooltip,
   Button,
 } from "@chakra-ui/react";
-import Talkmore from "../assets/images/comp2.png";
+import Talkmore from "../assets/PNG/comp2.png";
 import { useNavigate, useParams } from "react-router-dom";
 import { CiEdit } from "react-icons/ci";
 import { MdPersonAddAlt1, MdBlock } from "react-icons/md";
-import { addFriendToDB, getUserPosts } from "../lib/AppriteFunction";
+import { getUserPosts } from "../lib/AppriteFunction";
 import UserPostCard from "../components/PostComponents/UserPostCard";
 import useUserStatus from "../hooks/useUserStatus";
 import { UserContext } from "../Contexts/UserContext";
@@ -90,7 +90,7 @@ const Profile = () => {
 
   const addFriend = async () => {
     try {
-      await addFriendToDB(client.userID, userId);
+      // await addFriendToDB(client.userID, userId);
       toast({ title: "Friend Added", status: "success" });
     } catch (error) {
       toast({

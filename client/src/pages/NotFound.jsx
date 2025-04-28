@@ -1,5 +1,5 @@
 import React from 'react'
-import Page_Not_Found from '../assets/images/Not_Found.png'
+import Page_Not_Found from '../assets/PNG/Not_Found.png'
 
 const Not_Found = () => {
   return (

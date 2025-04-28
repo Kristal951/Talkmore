@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { createPost } from "../../lib/AppriteFunction";
 import { Button, Input, Spinner, useToast } from "@chakra-ui/react";
-import UploadFile from "../../assets/icons/file-upload.svg";
+import UploadFile from "../../assets/SVG/file-upload.svg";
 
 const CreateFilePostForm = ({ userId, getAllPosts }) => {
   const [postFile, setPostFile] = useState(null);

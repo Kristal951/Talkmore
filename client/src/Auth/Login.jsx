@@ -113,7 +113,7 @@ const Login = () => {
       <form className="flex flex-col gap-4" onSubmit={LoginUser}>
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Your Email"
           className="p-2 border-primary border-[1px] outline-0 rounded-lg"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -121,7 +121,7 @@ const Login = () => {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Your Password"
           className="p-2 border-primary border-[1px] outline-0 rounded-lg"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

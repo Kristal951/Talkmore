@@ -1,29 +1,61 @@
-import {
-  Button,
-  Divider,
-  Flex,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Divider, Flex, Text, useToast } from "@chakra-ui/react";
+import "./index.scss";
 import { useNavigate } from "react-router-dom";
-import Slide from "./Slide";
 import { useRef, useState } from "react";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
 import { GoogleLogin } from "@react-oauth/google";
+import { checkIfTagExists } from "../lib/AppriteFunction";
 
 const SignUp = () => {
-  const [name, setName] = useState("");
-  const [tag, setTag] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    tag: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [loading, setLoading] = useState(false);
   const [isSigningUpwithGoogle, setIsSigningUpwithGoogle] = useState(false);
+  const [tagMessage, setTagMessage] = useState("");
+  const [isTagAvailable, setIsTagAvailable] = useState(null);
 
   const toast = useToast();
   const navigate = useNavigate();
   const form = useRef();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const checkTag = async (tag) => {
+    setFormData((prev) => ({ ...prev, tag }));
+    setLoading(true);
+
+    try {
+      const tagCheck = await checkIfTagExists(tag);
+      setTagMessage(tagCheck.message);
+      setIsTagAvailable(tagCheck.status);
+      console.log(tagMessage, isTagAvailable)
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Tag unavailable",
+        description:
+          "The tag you plan on using is already being used by another user.",
+        status: "info",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const sendWelcomeMsg = async () => {
     try {
@@ -31,25 +63,19 @@ const SignUp = () => {
         "service_p6kig1e",
         "template_60eh2y9",
         form.current,
-        {
-          publicKey: "Si4-o4VjXbVTtgTtR",
-        }
+        { publicKey: "Si4-o4VjXbVTtgTtR" }
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !name ||
-      !tag ||
-      !password ||
-      !email ||
-      password !== confirmPassword
-    ) {
+    const { name, tag, email, password, confirmPassword } = formData;
+
+    if (!name || !tag || !email || !password || password !== confirmPassword) {
       toast({
         title: "Check your inputs",
         description:
@@ -83,7 +109,6 @@ const SignUp = () => {
 
         const { jwtToken } = res.data;
         localStorage.setItem("token", jwtToken);
-
         navigate("/");
       }
     } catch (error) {
@@ -124,6 +149,7 @@ const SignUp = () => {
         position: "top-right",
       });
 
+      await sendWelcomeMsg();
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -150,39 +176,64 @@ const SignUp = () => {
         >
           <input
             className="border-primary border-[1px] p-2 rounded-lg outline-0"
-            placeholder="Name"
-            name="user_name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="Your Name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
           />
           <input
             className="border-primary border-[1px] p-2 rounded-lg outline-0"
-            placeholder="Email"
+            placeholder="Your Email"
             type="email"
-            name="user_email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
           />
-          <input
-            className="border-primary border-[1px] p-2 rounded-lg outline-0"
-            placeholder="Tag"
-            value={tag}
-            onChange={(e) => setTag(e.target.value)}
-          />
+
+          <div className="flex w-full h-max flex-col">
+            <div className="flex w-full h-max">
+              <div className="bg-gray-100 flex py-2 px-3 border-[1px] rounded-l-lg border-r-0 border-primary text-primary font-bold">
+                <p className="text-xl">@</p>
+              </div>
+              <input
+                className="border-primary w-full border-[1px] p-2 rounded-r-lg outline-0"
+                placeholder="Your Tag"
+                type="text"
+                value={formData.tag}
+                onChange={(e) => checkTag(e.target.value)}
+              />
+            </div>
+            <div className="flex w-full h-max ml-1 mt-1 mb-1">
+              {tagMessage && (
+                <p
+                  className={`text-sm ${
+                    tagMessage.toLowerCase().includes("already exists")
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }`}
+                >
+                  {tagMessage}
+                </p>
+              )}
+            </div>
+          </div>
+
           <div className="w-full h-max flex gap-[10%]">
             <input
               className="border-primary w-[45%] border-[1px] p-2 rounded-lg outline-0"
               type="password"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
             />
             <input
               className="border-primary w-[45%] border-[1px] p-2 rounded-lg outline-0"
               type="password"
               placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
             />
           </div>
 
@@ -190,7 +241,7 @@ const SignUp = () => {
             type="submit"
             colorScheme="green"
             isLoading={loading}
-            isDisabled={loading || isSigningUpwithGoogle}
+            isDisabled={loading || isSigningUpwithGoogle || isTagAvailable === false}
             loadingText="Submitting"
           >
             Sign Up
