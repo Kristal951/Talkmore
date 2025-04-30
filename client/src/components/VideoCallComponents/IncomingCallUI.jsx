@@ -6,7 +6,9 @@ const IncomingCallUI = ({AcceptCall, DeclineCall}) => {
     const call = useCall();
 
     const createdBy = call.state.createdBy.name
-    const createdByImage = call.state.createdBy.image
+    const createdByImage = call.state.createdBy.image 
+
+    // 09035871061
     
   return (
     <div className="w-full h-screen flex items-center justify-center">

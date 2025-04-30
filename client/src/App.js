@@ -73,7 +73,7 @@ const App = () => {
                   <Route path="AudioCall/:callID" element={<AudioCallScreen />} />
 
                   {/* Utility */}
-                  <Route path="Search/results" element={<Search />} />
+                  <Route path="Search/:query" element={<Search />} />
                   <Route path="Settings" element={<Settings />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>

@@ -71,7 +71,7 @@ const PostCard = ({ post, onDelete }) => {
     setIsLiked(!isLiked);
 
     try {
-      await toggleLikePost(post?.$id, updatedLikes);
+      await toggleLikePost(post?.$id, userId);
     } catch (error) {
       console.error("Error updating likes:", error);
       setLikes(
@@ -143,7 +143,7 @@ const PostCard = ({ post, onDelete }) => {
     >
       {/* Avatar Section */}
       <div className="flex w-[70px] items-start justify-center h-full">
-        <Link to={`/profile/${post?.creator?.$id}`}>
+        <Link to={`/profile/${post?.creator?.$id}`} onClick={stopPropagation}>
           <Avatar
             src={post?.creator?.imgURL || "/default-avatar.png"}
             alt={`${post?.creator?.name}'s profile`}
@@ -158,6 +158,7 @@ const PostCard = ({ post, onDelete }) => {
         {/* User Info */}
         <Link
           to={`/profile/${post?.creator?.$id}`}
+          onClick={stopPropagation}
           className="flex flex-row items-center gap-2"
         >
           <h2 className="text-primary font-bold hover:underline text-[18px]">

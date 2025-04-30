@@ -6,12 +6,8 @@ import { updateProfile } from '../../lib/AppriteFunction';
 import { useNavigate } from 'react-router-dom';
 
 const EditProfileForm = () => {
-    const { userDetails, setUserDetails } = useContext(UserContext);
+  const { userDetails, setUserDetails } = useContext(UserContext);
 
-    useEffect(() => {
-        console.log("User details updated:", userDetails);
-      }, [userDetails]);
-    
   const [name, setName] = useState(userDetails.name);
   const [email, setEmail] = useState(userDetails.email || '');
   const [tag, setTag] = useState(userDetails.tag || '');
@@ -19,30 +15,47 @@ const EditProfileForm = () => {
   const [imgUrl, setImgUrl] = useState(userDetails.imgUrl);
   const [file, setFile] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const toast = useToast();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Log updated user details after the userDetails context updates
+    console.log("Updated User Details:", userDetails);
+  }, [userDetails]);
 
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
     if (file) {
       setImgUrl(URL.createObjectURL(file)); // Preview the image
-      setFile(file)
+      setFile(file);
     }
   };
+
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: 'image/*',
   });
 
-  const handleGoBack=()=>{
-    setIsEditing(false)
-    navigate(-1)
-  }
+  const handleGoBack = () => {
+    setIsEditing(false);
+    navigate(-1);
+  };
 
-  const userId = userDetails.id
+  const userId = userDetails.id;
 
   const handleSave = async () => {
+    if (!name.trim()) {
+      toast({
+        title: "Name is required",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       const updatedUser = {
@@ -55,9 +68,10 @@ const EditProfileForm = () => {
       };
 
       const res = await updateProfile(updatedUser);
-      console.log(res);
-  
-      setUserDetails({
+
+      // Update the userDetails in context after receiving the updated data
+      await setUserDetails({
+        id: res.$id,
         name: res.name,
         tag: res.tag,
         email: res.email,
@@ -65,19 +79,17 @@ const EditProfileForm = () => {
         imgUrl: res.imgURL,
         Bio: res.Bio,
       });
-  
+
+      setIsEditing(false);
+      handleGoBack();
       toast({
         title: 'Profile Updated',
         description: 'Your profile details have been saved successfully.',
         status: 'success',
         duration: 3000,
         isClosable: true,
-        position:'top-right'
+        position: 'top-right',
       });
-  
-      setIsEditing(false);
-      handleGoBack();
-  
     } catch (error) {
       console.error('Failed to save profile:', error);
       setLoading(false);
@@ -88,7 +100,7 @@ const EditProfileForm = () => {
         status: 'error',
         duration: 3000,
         isClosable: true,
-        position:'top-right'
+        position: 'top-right',
       });
     } finally {
       setLoading(false);
@@ -105,7 +117,7 @@ const EditProfileForm = () => {
   };
 
   return (
-    <Box w="full" h="100vh" p={6} bg="gray.50" _dark={{backgroundColor:"#212121e6"}} display="flex" overflowY="scroll" alignItems="center" justifyContent="center" margin="2">
+    <Box w="full" h="100vh" p={6} bg="gray.50" _dark={{ backgroundColor: "#212121e6" }} display="flex" overflowY="scroll" alignItems="center" justifyContent="center" margin="2">
       <VStack
         bg="white"
         p={8}
@@ -113,10 +125,10 @@ const EditProfileForm = () => {
         borderRadius="md"
         boxShadow="md"
         w={["100%", "80%", "50%", "40%"]}
-        _dark={{backgroundColor:"#2d2d2d"}}
+        _dark={{ backgroundColor: "#2d2d2d" }}
       >
         <Heading size="lg" mb={4}>Edit Profile</Heading>
-        
+
         <Avatar size="2xl" src={imgUrl} name={name} />
 
         {isEditing && (
@@ -141,7 +153,7 @@ const EditProfileForm = () => {
           isReadOnly={!isEditing}
           variant={isEditing ? 'outline' : 'filled'}
         />
-        
+
         <Input
           placeholder="Tag"
           value={tag}
@@ -149,7 +161,7 @@ const EditProfileForm = () => {
           isReadOnly={!isEditing}
           variant={isEditing ? 'outline' : 'filled'}
         />
-        
+
         <Textarea
           placeholder="Bio"
           value={bio}
@@ -162,16 +174,14 @@ const EditProfileForm = () => {
           {isEditing ? (
             <>
               <Button colorScheme="blue" onClick={handleSave}>
-                {
-                    loading ? <Spinner/> : 'Save'
-                }
+                {loading ? <Spinner /> : 'Save'}
               </Button>
               <Button colorScheme="gray" onClick={handleCancel}>Cancel</Button>
             </>
           ) : (
             <div className='w-full gap-14 flex'>
-                <Button colorScheme="blue" onClick={() => setIsEditing(true)}>Edit Profile</Button>
-                <Button colorScheme="blue" onClick={handleGoBack}>Go Back</Button>
+              <Button colorScheme="blue" onClick={() => setIsEditing(true)}>Edit Profile</Button>
+              <Button colorScheme="blue" onClick={handleGoBack}>Go Back</Button>
             </div>
           )}
         </HStack>

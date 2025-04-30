@@ -350,7 +350,12 @@ const SearchUser = async (req, res) => {
     const users = await databases.listDocuments(
       DATABASE_ID,
       COLLECTION_ID,
-      [Query.contains("name", query)]
+      [
+        Query.or([
+          Query.contains("name", query),
+          Query.contains("tag", query),
+        ])
+      ]
     );
 
     return res.status(200).json({ users });
@@ -359,6 +364,7 @@ const SearchUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 
 module.exports = {
   SignUpUser,

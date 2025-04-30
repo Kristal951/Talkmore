@@ -38,7 +38,7 @@ const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
     <div
       className={`flex items-center space-x-2 px-2 py-2 w-full ${
         isActive
-          ? "bg-gray-200 border-l-2 border-primary dark:border-white dark:bg-darkBackground2"
+          ? "bg-gray-200 border-l-2 border-primary dark:border-primary dark:bg-darkBackground2"
           : ""
       } dark:hover:bg-darkBackground2 hover:bg-gray-200`}
     >
@@ -51,18 +51,18 @@ const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
       ) : (
         <RiGroup2Fill
           size={40}
-          className={`${isActive ? "text-blue-600" : "text-gray-600"}`}
+          className={`${isActive ? "text-primary" : "text-gray-600"}`}
         />
       )}
       <div className="flex flex-row justify-between flex-1">
         <div className="flex flex-col">
-          <p className="font-semibold truncate">
+          <p className={`font-semibold truncate ${isActive ? "text-primary" : "text-gray-600"}`}>
             {channel?.data?.name || "Unnamed Channel"}
           </p>
-          <p className="text-sm text-gray-500 truncate w-[180px]">{latestMessageText}</p>
+          <p className={`text-sm truncate w-[180px] ${isActive ? "text-green-200" : "text-gray-500"}`}>{latestMessageText}</p>
         </div>
         <div className="flex">
-          <span className="text-xs text-gray-400">{formattedDate}</span>
+          <span className={`text-xs ${isActive ? "text-green-200" : "text-gray-400"}`} >{formattedDate}</span>
         </div>
       </div>
     </div>

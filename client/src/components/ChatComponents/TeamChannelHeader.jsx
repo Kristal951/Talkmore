@@ -133,11 +133,11 @@ const TeamChannelHeader = ({ setIsEditing }) => {
           className="w-10 h-10 rounded-full"
         />
       ) : (
-        <RiGroup2Fill className="w-10 h-10" />
+        <RiGroup2Fill className="w-10 h-10 text-primary" />
       )}
       <div className="flex flex-col">
         <h3
-          className="ml-2 text-blue-600 text-xl cursor-pointer dark:text-white"
+          className="ml-2 text-primary text-xl cursor-pointer dark:text-primary"
           onClick={() => navigateTo(`/Chat/${channel.id}/Info`)}
         >
           {teamChannelName}
@@ -152,17 +152,20 @@ const TeamChannelHeader = ({ setIsEditing }) => {
       <div className="flex flex-1 items-center text-blue-600">
         {channel.type === "team" ? renderTeamInfo() : renderMemberInfo()}
 
-        <div className="absolute right-28 flex space-x-2">
+        <div className="absolute right-10 flex space-x-2">
           <Tooltip label="Video Call" aria-label="Video Call">
             <IconButton
               icon={<FaVideo />}
               onClick={() =>
-                navigateTo(`/VideoCall/${channel.id}`, {
-                  videoCallMembers: members,
-                  channelType: channel.type,
-                })
+                navigate(`/VideoCall/${channel.id}`, {
+                  state: {
+                    videoCallMembers: members,
+                    channelType: channel.type,
+                  },
+                })   
               }
               aria-label="Video Call"
+              color="#41cc69"
             />
           </Tooltip>
           <Tooltip label="Audio Call" aria-label="Audio Call">
@@ -175,6 +178,7 @@ const TeamChannelHeader = ({ setIsEditing }) => {
                 })
               }
               aria-label="Audio Call"
+              color="#41cc69"
             />
           </Tooltip>
           <Tooltip label="More Options" aria-label="More Options">
@@ -182,6 +186,7 @@ const TeamChannelHeader = ({ setIsEditing }) => {
               icon={<BsThreeDotsVertical />}
               onClick={() => setShowMenu((prev) => !prev)}
               aria-label="More Options"
+              color="#41cc69"
             />
           </Tooltip>
         </div>
@@ -209,11 +214,11 @@ const TeamChannelHeader = ({ setIsEditing }) => {
 
       <MessagingHeader setIsEditing={setIsEditing} />
 
-      {channel.type === "team" && (
+      {/* {channel.type === "team" && (
         <div className="absolute right-2">
           <p>{getWatcherText(watcher_count)}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

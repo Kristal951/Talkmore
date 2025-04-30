@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { createPost } from "../../lib/AppriteFunction";
 import { Button, Input, Spinner, useToast } from "@chakra-ui/react";
 import UploadFile from "../../assets/SVG/file-upload.svg";
+import CustomToolbar from "../others/QuillCustomToolBar";
+import ReactQuill from "react-quill";
 
 const CreateFilePostForm = ({ userId, getAllPosts }) => {
   const [postFile, setPostFile] = useState(null);
   const [caption, setCaption] = useState("");
-  const [tags, setTags] = useState("");
   const [location, setLocation] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,6 @@ const CreateFilePostForm = ({ userId, getAllPosts }) => {
   const resetForm = () => {
     setPostFile(null);
     setCaption("");
-    setTags("");
     setLocation("");
     setFileType(null);
     setImagePreview(null);
@@ -44,7 +44,6 @@ const CreateFilePostForm = ({ userId, getAllPosts }) => {
 
       const postData = {
         caption,
-        tags,
         location,
         file: postFile,
         userId,
@@ -120,8 +119,52 @@ const CreateFilePostForm = ({ userId, getAllPosts }) => {
     },
   });
 
+  const quillRef = useRef();
+
+  const formats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "align",
+    "strike",
+    "script",
+    "blockquote",
+    "background",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+    "color",
+    "code-block",
+  ];
+
+  const modules = {
+    toolbar: {
+      container: "#custom-toolbar",
+    },
+  };
+
   return (
-    <form onSubmit={createNewPost} className="flex w-full flex-col gap-6">
+    <form onSubmit={createNewPost} className="flex w-full flex-col gap-6 pb-10">
+      <div className="flex w-full flex-col h-max">
+        <CustomToolbar
+          quillRef={quillRef}
+          // onEmojiClick={handleEmojiButtonClick}
+        />
+        <ReactQuill
+          ref={quillRef}
+          value={caption}
+          onChange={setCaption}
+          placeholder="Caption (optional)"
+          modules={modules}
+          theme=""
+          formats={formats}
+        />
+      </div>
       {/* File Upload */}
       <div
         {...getRootProps()}
@@ -149,7 +192,7 @@ const CreateFilePostForm = ({ userId, getAllPosts }) => {
               <img
                 src={UploadFile}
                 alt="Upload"
-                className="w-[100px] h-[100px]"
+                className="w-[100px] h-[100px] text-primary"
               />
               <p className="text-primary text-base text-center">
                 Drag and drop an image or video, or click below to select one
@@ -159,7 +202,7 @@ const CreateFilePostForm = ({ userId, getAllPosts }) => {
 
           <div className="flex w-full justify-center p-2">
             <Button
-              colorScheme="blue"
+              colorScheme="green"
               width="50%"
               onClick={() =>
                 document.querySelector('input[type="file"]').click()
@@ -171,30 +214,22 @@ const CreateFilePostForm = ({ userId, getAllPosts }) => {
         </div>
       </div>
 
-      {/* Caption, Tags, Location */}
-      <Input
-        placeholder="Caption"
-        value={caption}
-        onChange={(e) => setCaption(e.target.value)}
-      />
-      <Input
-        placeholder="Tags (comma separated)"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-      />
-      <Input
+      <input
         placeholder="Location"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
+        className="p-2 border-[1px] border-primary rounded-lg outline-0"
+        type="text"
       />
 
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex items-center pt-6 justify-between">
         <Button
           onClick={() => {
             resetForm();
           }}
           colorScheme="gray"
           variant="outline"
+          isDisabled={!postFile}
         >
           Cancel
         </Button>

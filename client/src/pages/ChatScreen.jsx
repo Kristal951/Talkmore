@@ -111,7 +111,7 @@ const ChatScreen = () => {
       <div className="flex flex-col bg-white h-full md:w-[300px] border-r-[1px] dark:bg-darkBackground2">
         <div className="flex w-full h-max items-center justify-between">
           <div className="p-4">
-            <h1 className="text-2xl font-bold text-primary dark:text-white">
+            <h1 className="text-2xl font-bold text-primary dark:text-primary">
               CHATS
             </h1>
           </div>
@@ -132,8 +132,8 @@ const ChatScreen = () => {
               key={tab.value}
               className={`text-base font-semibold px-2 py-1 border rounded-lg transition ${
                 activeTab === tab.value
-                  ? "dark:bg-white text-white dark:text-black bg-primary dark:border-white"
-                  : "dark:text-white dark:border-white dark:hover:bg-white hover:bg-primary border-primary hover:text-white"
+                  ? "dark:bg-primary text-white dark:text-white bg-primary dark:border-primary"
+                  : "dark:text-white dark:border-primary dark:hover:bg-primary hover:bg-primary border-primary hover:text-white"
               }`}
               onClick={() => setActiveTab(tab.value)}
             >

@@ -222,9 +222,10 @@ export const toggleLikePost = async (postId, userId) => {
 };
 
 export const updateProfile = async (updatedUser) => {
+  console.log(updatedUser)
   try {
     const { name, tag, bio, email, file, userId } = updatedUser;
-    if (!userId) throw new Error("User ID is required for updating profile");
+    if (!userId) return ("User ID is required for updating profile");
 
     let updatedData = {};
     if (name) updatedData.name = name;
@@ -258,14 +259,12 @@ export const updateProfile = async (updatedUser) => {
 };
 
 export const checkIfTagExists = async (query) => {
-  console.log(query)
   if (!query || query.trim().length === 0) {
     throw new Error("query cannot be empty.");
   }
 
   try {
     const existingTags = await databases.listDocuments("6713a7c9001581fc5175", "6713a7d200190a7a8f52", [Query.equal("tag", query)]);
-    console.log(existingTags)
     if (existingTags.total > 0) {
       return { message: "A user with this tag already exists.", status: false };
     } else {
@@ -285,3 +284,20 @@ export const handleDownload = async (fileId) => {
     console.error("Error downloading file:", error);
   }
 };
+
+export const queryPosts = async(query)=>{
+  console.log(query);
+  try{
+    const posts = await databases.listDocuments("6713a7c9001581fc5175", "6713ac4e0004c0f113e9",  [
+      Query.or([
+        Query.contains("TextContent", query),
+        Query.contains("caption", query),
+        Query.contains("location", query),
+      ])
+    ])
+    return posts;
+  }catch(error){
+    console.log(error);
+    throw new Error("Error Searching Post.");
+  }
+}
