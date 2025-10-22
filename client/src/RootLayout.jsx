@@ -10,14 +10,12 @@ import { IoMenuSharp } from "react-icons/io5";
 import { MdOutlineCancel } from "react-icons/md";
 import MobileNav from "./components/others/MobileNav";
 import { jwtDecode } from "jwt-decode";
+import TopBar from "./components/others/TopBar";
 
 const RootLayout = () => {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
   const { chatClient, isClientReady, error, setChatClient } = useChatClientContext();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const { colorMode, toggleColorMode } = useColorMode();
 
   // Update the color mode for the app
@@ -117,20 +115,12 @@ const RootLayout = () => {
       {
         userDetails != null ? <Chat client={chatClient} theme={`str-chat__theme-${colorMode}`}>
         <div className="w-full h-screen flex relative dark:bg-darkBackground">
-          <div className="menu-icon cursor-pointer hidden">
-            {isSidebarOpen ? (
-              <MdOutlineCancel size={28} onClick={toggleSidebar} />
-            ) : (
-              <IoMenuSharp size={28} onClick={toggleSidebar} />
-            )}
-          </div>
-          <div className="flex w-max h-max">
-            {isSidebarOpen && <MobileNav toggleSidebar={toggleSidebar} />}
-          </div>
   
           <Sidebar />
+
+          <TopBar />
   
-          <section className="flex flex-1 h-full section ml-[20%] overflow-hidden dark:bg-darkBackground">
+          <section className="flex flex-1 h-full section md:ml-[20%] mt-[60px] md:mt-0 overflow-hidden dark:bg-darkBackground">
             <Outlet />
           </section>
         </div>

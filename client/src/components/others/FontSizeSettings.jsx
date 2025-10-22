@@ -26,11 +26,11 @@ const FontSizeSettings = () => {
   };
 
   return (
-    <div className="font-size-settings flex items-center gap-4 p-2 bg-gray-100 dark:bg-opacity-25 dark:bg-primary rounded-lg shadow-md">
+    <div className="font-size-settings flex items-center gap-4 md:p-2 p-1 bg-green-50 dark:bg-opacity-25 dark:bg-primary rounded-lg shadow-md">
       <div className="font-size-options flex gap-4">
         <button
           onClick={() => handleFontSizeChange("small")}
-          className={`px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 border-2 ${
+          className={`px-1 py-1 text-sm font-medium rounded-lg transition-all duration-300 border-2 ${
             fontSize === "small"
               ? "bg-primary text-white border-primary"
               : "bg-gray-200 text-gray-800 dark:border-[1px] dark:border-primary border-transparent hover:bg-gray-300 dark:bg-transparent dark:text-white dark:hover:bg-gray-500"
@@ -40,7 +40,7 @@ const FontSizeSettings = () => {
         </button>
         <button
           onClick={() => handleFontSizeChange("medium")}
-          className={`px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 border-2 ${
+          className={`px-1 py-1 text-sm font-medium rounded-lg transition-all duration-300 border-2 ${
             fontSize === "medium"
               ? "bg-primary text-white border-primary"
               : "bg-gray-200 text-gray-800 dark:border-[1px] dark:border-primary border-transparent hover:bg-gray-300 dark:bg-transparent dark:text-white dark:hover:bg-gray-500"
@@ -50,7 +50,7 @@ const FontSizeSettings = () => {
         </button>
         <button
           onClick={() => handleFontSizeChange("large")}
-          className={`px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 border-[1px] ${
+          className={`px-1 py-1 text-sm font-medium rounded-lg transition-all duration-300 border-[1px] ${
             fontSize === "large"
               ? "bg-primary text-white border-primary"
               : "bg-gray-200 text-gray-800 dark:border-[1px] dark:border-primary border-transparent hover:bg-gray-300 dark:bg-transparent dark:text-white dark:hover:bg-gray-500"

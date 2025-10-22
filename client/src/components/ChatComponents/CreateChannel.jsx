@@ -81,9 +81,11 @@ const CreateChannel = ({ createType, setIsCreating }) => {
         image: fileUrl || "",
       });
 
-      await newChannel.create();
+      const channel = await newChannel.create();
+      console.log(channel);
+      console.log(channelName);
 
-      setActiveChannel(newChannel);
+      setActiveChannel(channel);
 
       setChannelName("");
       setSelectedUsers([client.userID || ""]);

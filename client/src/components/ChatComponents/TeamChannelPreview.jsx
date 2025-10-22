@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useChatContext } from "stream-chat-react";
 import { RiGroup2Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
@@ -12,12 +12,10 @@ const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
   const members = Object.values(channel.state.members).filter(
     ({ user }) => user.id !== client.userID
   );
-  const { cid } = useParams();
-  // const [types, id] = cid?.split(":");
-  // console.log(types, id)
+  
   const userID = members[0]?.user?.id || null;
   const isOnline = useUserStatus(userID);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const latestMessage = channel.state.messages?.slice(-1)[0] || null;
   const latestMessageText = latestMessage?.text || " ";
@@ -30,8 +28,8 @@ const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
   const channelImage = channel.data.image;
 
   const handleClick = () => {
-    setActiveChannel(channel); 
-    // navigate(`/chat/channel/${channel.cid}`)
+    setActiveChannel(channel);
+    navigate(`/chat/${channel.cid}`)
   };
 
   const TeamPreview = () => (
@@ -56,13 +54,32 @@ const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
       )}
       <div className="flex flex-row justify-between flex-1">
         <div className="flex flex-col">
-          <p className={`font-semibold truncate ${isActive ? "text-primary" : "text-gray-600"}`}>
+          <p
+            className={`font-semibold truncate ${
+              isActive ? "text-primary" : "text-gray-600"
+            }`}
+          >
             {channel?.data?.name || "Unnamed Channel"}
           </p>
-          <p className={`text-sm truncate w-[180px] ${isActive ? "text-green-200" : "text-gray-500"}`}>{latestMessageText}</p>
+          <p
+            className={`text-sm truncate w-[180px] ${
+              isActive ? "text-primary" : "text-gray-500"
+            }`}
+          >
+            {latestMessageText}
+          </p>
         </div>
-        <div className="flex">
-          <span className={`text-xs ${isActive ? "text-green-200" : "text-gray-400"}`} >{formattedDate}</span>
+        <div className="flex flex-col items-end">
+          <span
+            className={`text-xs ${isActive ? "text-primary" : "text-gray-400"}`}
+          >
+            {formattedDate}
+          </span>
+          {channel.state.unreadCount > 0 && (
+            <span className="p-1 px-2 bg-primary text-white rounded-full text-xs mt-1">
+              {channel.state.unreadCount}
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -87,9 +104,11 @@ const TeamChannelPreview = ({ channel, type, setActiveChannel }) => {
       <div className="flex flex-row justify-between flex-1">
         <div className="flex flex-col">
           <p className="font-semibold truncate">
-          {members[0]?.user?.name || "Anonymous User"}
+            {members[0]?.user?.name || "Anonymous User"}
           </p>
-          <p className="text-sm text-gray-500 truncate flex-1">{latestMessageText}</p>
+          <p className="text-sm text-gray-500 truncate flex-1">
+            {latestMessageText}
+          </p>
         </div>
         <div className="flex">
           <span className="text-xs text-gray-400">{formattedDate}</span>

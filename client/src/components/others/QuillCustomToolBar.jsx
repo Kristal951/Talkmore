@@ -87,16 +87,13 @@ const CustomToolbar = ({ quillRef }) => {
     }`;
 
   return (
-    <div className="w-full h-max flex flex-wrap justify-between gap-1 border-primary border-[1px] p-2 rounded-t-lg bg-white dark:bg-darkBackground">
+    <div id="custom-toolbar" className="w-full h-max flex flex-wrap justify-between gap-1 border-primary border-[1px] p-2 rounded-t-lg bg-white dark:bg-darkBackground">
       <select
         value={formats.size || ""}
         onChange={(e) => applyFormat("size", e.target.value || false)}
         className="p-1 border-primary border-[1px] hover:bg-green-100 cursor-pointer rounded-md text-primary font-medium"
       >
-        <option value="">Normal</option>
-        <option value="extra-small">XS</option>
         <option value="small">Small</option>
-        <option value="medium">Medium</option>
         <option value="large">Large</option>
         <option value="huge">Huge</option>
       </select>

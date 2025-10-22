@@ -46,8 +46,36 @@ const updateUser = async (req, res) => {
     }
 };
 
+const searchChannels = async (req, res) => {
+    try {
+      const { query, userID } = req.body;
+  
+      const filter = {
+        name: { $autocomplete: query },
+      };
+  
+      if (userID) {
+        filter.members = { $in: [userID] };
+      }
+  
+      const channels = await StreamClient.queryChannels(
+        filter,
+        { last_message_at: -1 },
+        { watch: false, state: false }
+      );
+  
+      // Extract only the `.data` from each channel to avoid circular references
+      const channelData = channels.map(channel => channel.data);
+  
+      return res.status(200).json({ channels: channelData });
+    } catch (error) {
+      console.error("Error searching channels:", error);
+      return res.status(500).json({ error: "Failed to search channels" });
+    }
+  };  
 
 module.exports ={
     createToken,
-    updateUser
+    updateUser,
+    searchChannels
 } 

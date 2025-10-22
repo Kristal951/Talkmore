@@ -19,7 +19,7 @@ const AuthLayout = () => {
     <div className="flex w-full dark:bg-darkBackground2 h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 overflow-hidden">
       {/* Left Video Panel */}
       <div className="hidden md:hidden lg:flex flex-1">
-        <img src={illustration1} className="w-full h-full" alt="" animation />
+        <img src={illustration1} className="w-full h-full" alt="" />
       </div>
 
       {/* Right Form Panel */}

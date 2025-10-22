@@ -1,17 +1,25 @@
 import React, { useState, useRef } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // import styles for React Quill
-import EmojiPicker from "@emoji-mart/react"; // Corrected import for emoji-mart
+import "react-quill/dist/quill.snow.css"; // Quill styles
+import EmojiPicker from "@emoji-mart/react"; // Emoji picker
 import CustomToolbar from "./QuillCustomToolBar";
 import "./index.scss";
 import { Button, Spinner, useToast } from "@chakra-ui/react";
-import { createPost } from "../../lib/AppriteFunction";
+import { createPost, queryUsersTag } from "../../lib/AppriteFunction";
+
+// Quill and module imports
+import Quill from "quill";
+import {Mention} from "quill-mention";
+import "quill-mention/dist/quill.mention.css";
+
+// Register the mention module
+Quill.register("modules/mention", Mention);
 
 const QuiilEditor = ({ getAllPosts, userId }) => {
   const [value, setValue] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [creatingTextPost, setCreatingTextPost] = useState(false);
-  const quillRef = useRef(null); // React Quill Ref
+  const quillRef = useRef(null);
   const toast = useToast();
 
   const createTextPost = async (e) => {
@@ -26,6 +34,7 @@ const QuiilEditor = ({ getAllPosts, userId }) => {
         position: "top-right",
       });
     }
+
     try {
       setCreatingTextPost(true);
       const payload = {
@@ -34,20 +43,24 @@ const QuiilEditor = ({ getAllPosts, userId }) => {
         mimeType: "text/plain",
       };
       await createPost(payload);
-      return toast({
-        title: "Post created",
-        description: "Text Post Created.",
+
+      toast({
+        title: "Post Created",
+        description: "Text post successfully created.",
         status: "success",
         duration: 3000,
         isClosable: true,
         position: "top-right",
       });
+
+      setValue("");
+      setShowEmojiPicker(false);
+      getAllPosts();
     } catch (error) {
-      console.log(error);
-      setCreatingTextPost(false);
-      return toast({
+      console.error(error);
+      toast({
         title: "Post Creation Failed",
-        description: "Text Post Creation Failed.",
+        description: "Something went wrong while creating the post.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -55,21 +68,16 @@ const QuiilEditor = ({ getAllPosts, userId }) => {
       });
     } finally {
       setCreatingTextPost(false);
-      setValue("");
-      setShowEmojiPicker(false);
-      getAllPosts();
     }
   };
 
-  // Emoji picker button click handler
   const handleEmojiButtonClick = () => {
     setShowEmojiPicker(!showEmojiPicker);
   };
 
-  // Handle emoji selection and insert into the editor
   const handleEmojiSelect = (emoji) => {
     const quill = quillRef.current.getEditor();
-    const cursorPosition = quill.getSelection().index;
+    const cursorPosition = quill.getSelection()?.index || 0;
     quill.insertText(cursorPosition, emoji.native);
     setShowEmojiPicker(false);
   };
@@ -77,6 +85,30 @@ const QuiilEditor = ({ getAllPosts, userId }) => {
   const modules = {
     toolbar: {
       container: "#custom-toolbar",
+    },
+    mention: {
+      allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
+      mentionDenotationChars: ["@"],
+      source: async function (searchTerm, renderList) {
+        try {
+          if (!searchTerm) {
+            return renderList([], searchTerm); // Ensure renderList is always called
+          }
+    
+          const res = await queryUsersTag(searchTerm);
+          const users = res.data?.users?.documents || [];
+    
+          const suggestions = users.map((user) => ({
+            id: user.$id,
+            value: user.tag,
+          }));
+    
+          renderList(suggestions, searchTerm);
+        } catch (err) {
+          console.error("Mention fetch error", err);
+          renderList([], searchTerm); // Fallback on error
+        }
+      }, 
     },
   };
 
@@ -99,6 +131,7 @@ const QuiilEditor = ({ getAllPosts, userId }) => {
     "image",
     "color",
     "code-block",
+    "mention",
   ];
 
   return (
@@ -113,8 +146,8 @@ const QuiilEditor = ({ getAllPosts, userId }) => {
         onChange={setValue}
         placeholder="Write your post..."
         modules={modules}
-        theme=""
         formats={formats}
+        theme="snow"
       />
       <div className="flex flex-col w-full items-end justify-end mt-2">
         <Button

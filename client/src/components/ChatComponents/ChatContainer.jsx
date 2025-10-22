@@ -7,7 +7,6 @@ import { Channel, useChatContext } from "stream-chat-react";
 import { EmojiPicker } from "stream-chat-react/emojis";
 import CustomMessageRenderer from "./CustomMessageRenderer";
 import CustomPinIndicator from "./CustomPinIndicator";
-import { useColorMode } from "@chakra-ui/react";
 
 const ChatContainer = ({
   isCreating,
@@ -16,7 +15,7 @@ const ChatContainer = ({
   setIsEditing,
   createType,
 }) => {
-  const { channel, setActiveChannel } = useChatContext();
+  const { channel } = useChatContext();
 
   if (isCreating) {
     return (
@@ -34,16 +33,22 @@ const ChatContainer = ({
     );
   }
 
+  if (!channel) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen text-lg dark:bg-darkBackground2">
+        <p className="text-primary font-extrabold">Please select a channel to start chatting.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-screen">
       <Channel
         EmptyStateIndicator={EmptyChannelState}
         EmojiPicker={EmojiPicker}
         Message={CustomMessageRenderer}
-        theme="str-chat__theme-dark"
-        channel={channel}
         PinIndicator={CustomPinIndicator}
-        // Message={(messageProps)=> <CustomMessageRenderer {...messageProps}/>}
+        theme="str-chat__theme-dark"
       >
         <ChannelInner setIsEditing={setIsEditing} />
       </Channel>

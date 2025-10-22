@@ -1,16 +1,21 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { getPostByID, getCommentsByPostID, addComment } from '../../lib/AppriteFunction';
-import { UserContext } from '../../Contexts/UserContext';
-import PostCommentCard from './CommentCard';
-import { Avatar, Button, Spinner, useToast } from '@chakra-ui/react';
-import './index.scss';
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import {
+  getPostByID,
+  getCommentsByPostID,
+  addComment,
+} from "../../lib/AppriteFunction";
+import { UserContext } from "../../Contexts/UserContext";
+import PostCommentCard from "./CommentCard";
+import { Avatar, Button, Spinner, useToast } from "@chakra-ui/react";
+import "./index.scss";
+import TextareaAutosize from "react-textarea-autosize";
 
 const PostComments = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const { userDetails } = useContext(UserContext);
   const toast = useToast();
@@ -24,7 +29,7 @@ const PostComments = () => {
         setPost(fetchedPost);
         setComments(fetchedComments.documents);
       } catch (error) {
-        console.log('Error fetching post or comments:', error);
+        console.log("Error fetching post or comments:", error);
       }
     };
     fetchPostAndComments();
@@ -37,15 +42,16 @@ const PostComments = () => {
         const comment = await addComment({
           postId,
           userId,
-          content
+          content,
         });
         setComments([...comments, comment]);
-        setContent('');
+        setContent("");
       } catch (error) {
-        console.log('Error adding comment:', error);
+        console.log("Error adding comment:", error);
         toast({
           title: "Unable to add comment",
-          description: "There was an error posting your comment. Please try again.",
+          description:
+            "There was an error posting your comment. Please try again.",
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -66,6 +72,11 @@ const PostComments = () => {
 
   const fileType = post.mimeType;
 
+  const handleChange = (event) => {
+    setContent(event.target.value);
+  };
+
+
   return (
     <div className="flex-row flex w-full max-h-screen gap-6 relative overflow-hidden post-comment-container">
       <div className="flex w-[50%] h-screen">
@@ -81,20 +92,25 @@ const PostComments = () => {
               </Link>
               <div className="flex items-start flex-col">
                 <p className="font-bold">{post.creator.name}</p>
-                <p className="text-sm text-[#4b5563] opacity-50">{post.creator.tag}</p>
+                <p className="text-sm text-[#4b5563] opacity-50">
+                  {post.creator.tag}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="w-full flex flex-col items-start">
-            {fileType.includes('image') ? (
+            {fileType.includes("image") ? (
               <img
                 src={post.imgURL}
                 alt="post media"
                 className="w-full h-[430px] z-10 object-cover rounded-md"
               />
             ) : (
-              <video controls className="w-full h-[450px] z-10 object-cover rounded-md">
+              <video
+                controls
+                className="w-full h-[450px] z-10 object-cover rounded-md"
+              >
                 <source src={post.vidURL} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
@@ -106,7 +122,10 @@ const PostComments = () => {
             <div className="mt-2 w-full h-max flex flex-row gap-2 justify-between items-center">
               <div className="flex flex-row gap-2">
                 {post.tags.map((tag, index) => (
-                  <span key={index} className="px-2 py-1 bg-gray-200 rounded-md text-sm">
+                  <span
+                    key={index}
+                    className="px-2 py-1 bg-gray-200 rounded-md text-sm"
+                  >
                     {tag}
                   </span>
                 ))}
@@ -131,20 +150,20 @@ const PostComments = () => {
         </div>
 
         <div className="mt-4 w-full h-max flex gap-3 flex-row">
-          <textarea
+          <TextareaAutosize
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-[80%] p-2 border rounded-md"
-            rows={1}
-            placeholder="Add your comment"
+            onChange={handleChange}
+            // minRows={3} // Set the minimum rows for the textarea
+            // maxRows={6} // Set the maximum rows for the textarea
+            placeholder="Type something here..."
           />
           <Button
             onClick={handleAddComment}
             variant="solid"
             disabled={loading}
-            colorScheme='blue'
+            colorScheme="blue"
           >
-            {loading ? <Spinner size="sm" /> : 'Submit'}
+            {loading ? <Spinner size="sm" /> : "Submit"}
           </Button>
         </div>
       </div>

@@ -1,26 +1,29 @@
 import axios from "axios";
-const { Client, Storage, Databases, ID, Query } = require("appwrite");
+import { Client, Storage, Databases, ID, Query } from "appwrite";
+import { APPWRITE_CONFIG } from "./appwrite.config";
 
 const AppwriteClient = new Client();
-AppwriteClient.setEndpoint("https://cloud.appwrite.io/v1").setProject("670ea1ea0016e28a21d8");
+AppwriteClient.setEndpoint(APPWRITE_CONFIG.endpoint).setProject(
+  APPWRITE_CONFIG.projectId
+);
 
 const storage = new Storage(AppwriteClient);
 const databases = new Databases(AppwriteClient);
 
+// ========== File Upload ==========
 export const uploadFile = async (file) => {
   try {
     const maxSize = 50 * 1024 * 1024;
-    if (file.size > maxSize) {
+    if (file.size > maxSize)
       throw new Error("File size exceeds the maximum limit of 50 MB.");
-    }
 
-    const uploadedFile = await storage.createFile("671116b10025310bdc15", ID.unique(), file);
+    const uploadedFile = await storage.createFile(
+      APPWRITE_CONFIG.fileBucketId,
+      ID.unique(),
+      file
+    );
+    if (!uploadedFile) throw new Error("Error uploading file.");
 
-    if (!uploadedFile) {
-      throw new Error("Error creating post.");
-    }
-
-    console.log("Uploaded file details:", uploadedFile);
     return uploadedFile;
   } catch (error) {
     console.error("File upload error:", error.message || error);
@@ -30,7 +33,7 @@ export const uploadFile = async (file) => {
 
 const deleteFileUrl = async (fileId) => {
   try {
-    await storage.deleteFile("671116b10025310bdc15", fileId);
+    await storage.deleteFile(APPWRITE_CONFIG.fileBucketId, fileId);
     return { message: "File deleted successfully" };
   } catch (error) {
     console.error("Error deleting file:", error);
@@ -40,12 +43,14 @@ const deleteFileUrl = async (fileId) => {
 
 export const getFileUrl = async (fileId) => {
   try {
-    const fileUrl = await storage.getFileView("671116b10025310bdc15", fileId);
+    const fileUrl = await storage.getFileView(
+      APPWRITE_CONFIG.fileBucketId,
+      fileId
+    );
     if (!fileUrl) {
       await deleteFileUrl(fileId);
       throw new Error("File URL not available");
     }
-    console.log(fileUrl);
     return fileUrl.href;
   } catch (error) {
     console.error("Error getting file URL:", error);
@@ -55,76 +60,70 @@ export const getFileUrl = async (fileId) => {
 
 export const getfilePrev = async (fileId) => {
   try {
-    const fileUrl = await storage.getFilePreview(
-      "671116b10025310bdc15", fileId, 2000, 2000, "top", 100
-    );
-    if (!fileUrl) {
-      await deleteFileUrl(fileId);
-      throw new Error("File URL not available");
-    }
-    return fileUrl.href;
+    await storage.getFile(APPWRITE_CONFIG.fileBucketId, fileId);
+    return `${APPWRITE_CONFIG.endpoint}/storage/buckets/${APPWRITE_CONFIG.fileBucketId}/files/${fileId}/view?project=${APPWRITE_CONFIG.projectId}`;
   } catch (error) {
     console.error("Error getting file preview:", error);
-    throw error;
+    throw new Error("Failed to retrieve file URL.");
   }
 };
 
+// ========== Post Logic ==========
 export const createPost = async (post) => {
   try {
-    if (!post) {
-      return { message: "Post data is missing" };
-    }
+    if (!post) return { message: "Post data is missing" };
 
     const { file, mimeType, userId, caption, location } = post;
     const fileType = file?.type;
 
-    // Handle text-only post
     if (!file && mimeType?.startsWith("text/")) {
-      const newPost = await databases.createDocument("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", ID.unique(), {
-        creator: post.creator,
-        TextContent: post.TextContent,
-        mimeType,
-        location,
-      });
+      const newPost = await databases.createDocument(
+        APPWRITE_CONFIG.databaseId,
+        APPWRITE_CONFIG.postCollectionId,
+        ID.unique(),
+        {
+          creator: post.creator,
+          TextContent: post.TextContent,
+          mimeType,
+          location,
+        }
+      );
       return { message: "Text post created successfully", newPost };
     }
 
-    // If no file present for image/video
-    if (!file) {
-      return { message: "File is missing for media post." };
-    }
+    if (!file) return { message: "File is missing for media post." };
 
-    // Upload file and get URL
     const uploadedFile = await uploadFile(file);
     const fileUrl = await getFileUrl(uploadedFile.$id);
 
-    // Handle video
+    const payload = {
+      creator: userId,
+      caption,
+      mimeType: fileType,
+      location,
+      fileID: uploadedFile.$id,
+    };
+
     if (fileType.startsWith("video/")) {
-      const newPost = await databases.createDocument("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", ID.unique(), {
-        creator: userId,
-        caption,
-        vidURL: fileUrl,
-        mimeType: fileType,
-        location,
-        fileID: uploadedFile.$id,
-      });
-      return { message: "Video post created successfully", newPost };
+      payload.vidURL = fileUrl;
+    } else if (fileType.startsWith("image/")) {
+      payload.imgURL = fileUrl;
+    } else {
+      return { message: "Unsupported file type." };
     }
 
-    // Handle image
-    if (fileType.startsWith("image/")) {
-      const newPost = await databases.createDocument("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", ID.unique(), {
-        creator: userId,
-        caption,
-        imgURL: fileUrl,
-        mimeType: fileType,
-        location,
-        fileID: uploadedFile.$id,
-      });
-      return { message: "Image post created successfully", newPost };
-    }
-
-    return { message: "Unsupported file type." };
+    const newPost = await databases.createDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.postCollectionId,
+      ID.unique(),
+      payload
+    );
+    return {
+      message: `${
+        fileType.startsWith("video/") ? "Video" : "Image"
+      } post created successfully`,
+      newPost,
+    };
   } catch (error) {
     console.error("Error creating post:", error);
     return { message: error.message || "Internal server error" };
@@ -133,10 +132,13 @@ export const createPost = async (post) => {
 
 export const deletePost = async (post) => {
   try {
-    const documentID = post.$id;
-    await databases.deleteDocument("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", documentID);
+    await databases.deleteDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.postCollectionId,
+      post.$id
+    );
     await deleteFileUrl(post.fileID);
-    return { message: "File deleted successfully" };
+    return { message: "Post and file deleted successfully" };
   } catch (error) {
     console.error("Error deleting post:", error);
   }
@@ -144,8 +146,11 @@ export const deletePost = async (post) => {
 
 export const getPostByID = async (postId) => {
   try {
-    const post = await databases.getDocument("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", postId);
-    return post;
+    return await databases.getDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.postCollectionId,
+      postId
+    );
   } catch (error) {
     console.log("Error fetching post:", error);
     throw new Error("Unable to fetch post");
@@ -154,23 +159,29 @@ export const getPostByID = async (postId) => {
 
 export const getCommentsByPostID = async (postId) => {
   try {
-    const comments = await databases.listDocuments("6713a7c9001581fc5175", "671b4ada0035747f596d", [Query.equal("post", postId)]);
-    return comments;
+    return await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.commentCollectionId,
+      [Query.equal("post", postId)]
+    );
   } catch (error) {
     console.error("Error fetching comments:", error);
     throw new Error("Unable to fetch comments");
   }
 };
 
-export const addComment = async (payload) => {
+export const addComment = async ({ postId, userId, content }) => {
   try {
-    const { postId, userId, content } = payload;
-    const newComment = await databases.createDocument("6713a7c9001581fc5175", "671b4ada0035747f596d", ID.unique(), {
-      post: postId,
-      creator: userId,
-      content,
-    });
-    return newComment;
+    return await databases.createDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.commentCollectionId,
+      ID.unique(),
+      {
+        post: postId,
+        creator: userId,
+        content,
+      }
+    );
   } catch (error) {
     console.error("Error adding comment:", error);
     throw new Error("Unable to add comment");
@@ -179,7 +190,11 @@ export const addComment = async (payload) => {
 
 export const getUserPosts = async (userId) => {
   try {
-    const response = await databases.listDocuments("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", [Query.equal("creator", userId)]);
+    const response = await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.postCollectionId,
+      [Query.equal("creator", userId)]
+    );
     return response.documents;
   } catch (error) {
     console.error("Error fetching user posts:", error);
@@ -189,26 +204,26 @@ export const getUserPosts = async (userId) => {
 
 export const toggleLikePost = async (postId, userId) => {
   try {
-    // Fetch the post
-    const response = await databases.listDocuments("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", [Query.equal("$id", postId)]);
-    
-    // Ensure post exists
+    const response = await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.postCollectionId,
+      [Query.equal("$id", postId)]
+    );
     const post = response.documents[0];
-    if (!post) {
-      return { message: "Post not found" };
-    }
+    if (!post) return { message: "Post not found" };
 
-    // Ensure likes array exists and toggle like status
     const likes = post.likes || [];
     const hasLiked = likes.includes(userId);
-    
-    if (hasLiked) {
-      post.likes = likes.filter((id) => id !== userId);
-    } else {
-      post.likes.push(userId);
-    }
+    post.likes = hasLiked
+      ? likes.filter((id) => id !== userId)
+      : [...likes, userId];
 
-    await databases.updateDocument("6713a7c9001581fc5175", "6713ac4e0004c0f113e9", postId, { likes: post.likes });
+    await databases.updateDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.postCollectionId,
+      postId,
+      { likes: post.likes }
+    );
 
     return {
       isLiked: !hasLiked,
@@ -221,25 +236,30 @@ export const toggleLikePost = async (postId, userId) => {
   }
 };
 
+// ========== User ==========
 export const updateProfile = async (updatedUser) => {
-  console.log(updatedUser)
   try {
     const { name, tag, bio, email, file, userId } = updatedUser;
-    if (!userId) return ("User ID is required for updating profile");
+    if (!userId) throw new Error("User ID is required for updating profile");
 
-    let updatedData = {};
-    if (name) updatedData.name = name;
-    if (tag) updatedData.tag = tag;
-    if (bio) updatedData.Bio = bio;
-    if (email) updatedData.email = email;
+    const updatedData = {
+      ...(name && { name }),
+      ...(tag && { tag }),
+      ...(bio && { Bio: bio }),
+      ...(email && { email }),
+    };
 
     if (file instanceof File) {
       const newFile = await uploadFile(file);
-      const fileURL = await getFileUrl(newFile.$id);
-      updatedData.imgURL = fileURL;
+      updatedData.imgURL = await getFileUrl(newFile.$id);
     }
 
-    const response = await databases.updateDocument("6713a7c9001581fc5175", "6713a7d200190a7a8f52", userId, updatedData);
+    const response = await databases.updateDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.userCollectionId,
+      userId,
+      updatedData
+    );
 
     await axios.post("http://localhost:5000/stream/updateUser", {
       userId,
@@ -250,7 +270,6 @@ export const updateProfile = async (updatedUser) => {
       imgUrl: response.imgURL,
     });
 
-    console.log("Profile updated successfully:", response);
     return response;
   } catch (error) {
     console.error("Failed to update profile:", error);
@@ -259,45 +278,120 @@ export const updateProfile = async (updatedUser) => {
 };
 
 export const checkIfTagExists = async (query) => {
-  if (!query || query.trim().length === 0) {
+  if (!query || query.trim().length === 0)
     throw new Error("query cannot be empty.");
-  }
 
   try {
-    const existingTags = await databases.listDocuments("6713a7c9001581fc5175", "6713a7d200190a7a8f52", [Query.equal("tag", query)]);
-    if (existingTags.total > 0) {
-      return { message: "A user with this tag already exists.", status: false };
-    } else {
-      return { message: "This tag is available.", status: true };
-    }
+    const existingTags = await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.userCollectionId,
+      [Query.equal("tag", query)]
+    );
+    return {
+      message:
+        existingTags.total > 0
+          ? "A user with this tag already exists."
+          : "This tag is available.",
+      status: existingTags.total === 0,
+    };
   } catch (error) {
     console.log(error);
     throw new Error("Error checking tag availability.");
   }
 };
 
+// ========== Search ==========
 export const handleDownload = async (fileId) => {
   try {
-    const fileUrl = await storage.getFileDownload("671116b10025310bdc15", fileId);
+    const fileUrl = await storage.getFileDownload(
+      APPWRITE_CONFIG.fileBucketId,
+      fileId
+    );
     window.location.href = fileUrl.href;
   } catch (error) {
     console.error("Error downloading file:", error);
   }
 };
 
-export const queryPosts = async(query)=>{
-  console.log(query);
-  try{
-    const posts = await databases.listDocuments("6713a7c9001581fc5175", "6713ac4e0004c0f113e9",  [
-      Query.or([
-        Query.contains("TextContent", query),
-        Query.contains("caption", query),
-        Query.contains("location", query),
-      ])
-    ])
-    return posts;
-  }catch(error){
+export const queryPosts = async (query) => {
+  try {
+    return await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.postCollectionId,
+      [
+        Query.or([
+          Query.contains("TextContent", query),
+          Query.contains("caption", query),
+          Query.contains("location", query),
+        ]),
+      ]
+    );
+  } catch (error) {
     console.log(error);
     throw new Error("Error Searching Post.");
   }
-}
+};
+
+export const ReportPost = async (postId, userId, reason, comment) => {
+  try {
+    await databases.createDocument(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.reportCollectionId,
+      ID.unique(),
+      {
+        reporterID: userId,
+        postID: postId,
+        reason,
+        comment,
+        status: "pending",
+      }
+    );
+
+    return { text: "Message reported successfully.", status: true };
+  } catch (error) {
+    console.error("Error reporting post:", error);
+    return { text: "Failed to report the message.", status: false };
+  }
+};
+
+export const queryUsers = async (query) => {
+  try {
+    const users = await axios.post("http://localhost:5000/user/searchUser", {
+      query,
+    });
+    return users?.data?.users || [];
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+};
+
+export const queryChannels = async (query) => {
+  try {
+    const channels = await axios.post(
+      "http://localhost:5000/stream/searchChannels",
+      { query }
+    );
+    return channels?.data || [];
+  } catch (error) {
+    console.error("Error fetching channels:", error);
+    return [];
+  }
+};
+
+export const queryUsersTag = async (query) => {
+  try {
+    const users = await databases.listDocuments(
+      APPWRITE_CONFIG.databaseId,
+      APPWRITE_CONFIG.userCollectionId,
+      [Query.contains("tag", query)]
+    );
+
+    if (users.total === 0) return [];
+
+    return users.documents;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+};

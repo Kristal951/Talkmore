@@ -25,6 +25,7 @@ import { UserContext } from "../Contexts/UserContext";
 import UserPostCard from "../components/PostComponents/UserPostCard";
 import ProfileMenu from "../components/others/ProfileMenu";
 import PostCard from "../components/PostComponents/PostCard";
+import { Helmet } from "react-helmet-async";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -48,7 +49,10 @@ const Profile = () => {
     const fetchUser = async () => {
       try {
         setLoadingUser(true);
-        const res = await client.queryUsers({ id: { $eq: userId } }, { limit: 1 });
+        const res = await client.queryUsers(
+          { id: { $eq: userId } },
+          { limit: 1 }
+        );
         setStreamUser(res.users[0]);
       } catch {
         setError("Failed to load user details.");
@@ -116,11 +120,22 @@ const Profile = () => {
   }
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-y-scroll">
+    <div className="flex flex-col w-full h-screen overflow-y-scroll mt-[60px]">
+      <Helmet>
+        <title>{`Profile | Talkmore - ${streamUser?.name}'s Profile`}</title>
+        <meta
+          name="description"
+          content="See the latest posts and connect with users on Talkmore."
+        />
+      </Helmet>
       <div className="w-full h-[80%] flex flex-col">
         {/* Banner */}
         <div className="w-full h-[50%] border-b-2 border-primary dark:border-0">
-          <img src={Talkmore} alt="Talkmore" className="w-full h-full object-cover" />
+          <img
+            src={Talkmore}
+            alt="Talkmore"
+            className="w-full h-full object-cover"
+          />
         </div>
 
         {/* Avatar + User Info */}
@@ -147,9 +162,17 @@ const Profile = () => {
             </div>
 
             <div className="pl-2">
-              <h2 className="text-primary text-xl font-bold">{streamUser?.name}</h2>
-              <p className="text-green-300 text-sm font-bold">@{streamUser?.tag}</p>
-              <p className={`text-green-300 max-w-[400px] text-sm font-bold overflow-hidden ${isBioExpanded ? "" : "line-clamp-3"}`}>
+              <h2 className="text-primary text-xl font-bold">
+                {streamUser?.name}
+              </h2>
+              <p className="text-green-300 text-sm font-bold">
+                @{streamUser?.tag}
+              </p>
+              <p
+                className={`text-green-300 max-w-[400px] text-sm font-bold overflow-hidden ${
+                  isBioExpanded ? "" : "line-clamp-3"
+                }`}
+              >
                 {streamUser?.bio || "No bio available."}
               </p>
               {streamUser?.bio?.length > 100 && (
@@ -199,8 +222,15 @@ const Profile = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="w-full h-max px-4 bg-white dark:bg-darkBackground">
-        <Tabs variant="enclosed" isFitted colorScheme="green" position="sticky" top="0" >
+      <div className="w-full h-max md:px-4 bg-white dark:bg-darkBackground">
+        <Tabs
+          variant="enclosed"
+          isFitted
+          colorScheme="green"
+          position="sticky"
+          top="0"
+          padding="0"
+        >
           <TabList>
             <Tab>Posts</Tab>
             <Tab>Liked Posts</Tab>
@@ -215,7 +245,7 @@ const Profile = () => {
                   <Spinner size="lg" />
                 </div>
               ) : userPosts.length > 0 ? (
-                <div className="flex w-[60%] flex-col gap-4">
+                <div className="flex md:w-[60%] w-full flex-col gap-4">
                   {userPosts.map((post) => (
                     <PostCard key={post.$id} post={post} />
                   ))}
@@ -227,23 +257,23 @@ const Profile = () => {
 
             {/* Liked Posts Tab */}
             <TabPanel>
-              <p className="text-gray-400 text-center">Liked posts feature coming soon.</p>
+              <p className="text-gray-400 text-center">
+                Liked posts feature coming soon.
+              </p>
             </TabPanel>
 
             {/* Bookmarks Tab */}
             <TabPanel>
-              <p className="text-gray-400 text-center">Bookmarks feature coming soon.</p>
+              <p className="text-gray-400 text-center">
+                Bookmarks feature coming soon.
+              </p>
             </TabPanel>
           </TabPanels>
         </Tabs>
       </div>
 
       {/* Error Message */}
-      {error && (
-        <div className="text-red-500 text-center py-4">
-          {error}
-        </div>
-      )}
+      {error && <div className="text-red-500 text-center py-4">{error}</div>}
     </div>
   );
 };

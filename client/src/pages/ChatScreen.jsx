@@ -6,7 +6,6 @@ import React, {
   useCallback,
 } from "react";
 import { ChannelList, useChatContext } from "stream-chat-react";
-import TeamChannelList from "../components/ChatComponents/TeamChannelList";
 import TeamChannelPreview from "../components/ChatComponents/TeamChannelPreview";
 import { UserContext } from "../Contexts/UserContext";
 import ChatContainer from "../components/ChatComponents/ChatContainer";
@@ -14,12 +13,19 @@ import "stream-chat-react/dist/css/v2/index.css";
 import "./index.scss";
 import MessageChannelList from "../components/ChatComponents/MessageChannelList";
 import AddChannelIcon from "../components/ChatComponents/AddChannelIcon";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import Search from "../components/ChatComponents/Search";
+import { ChatUIContext } from "../Contexts/ChatContext";
 
 const ChatScreen = () => {
-  const [createType, setCreateType] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const {
+    createType,
+    setCreateType,
+    isCreating,
+    setIsCreating,
+    isEditing,
+    setIsEditing,
+  } = useContext(ChatUIContext);
   const [activeTab, setActiveTab] = useState("team");
   const { setActiveChannel, client } = useChatContext();
   const { userDetails } = useContext(UserContext);
@@ -108,7 +114,7 @@ const ChatScreen = () => {
   return (
     <div className="flex flex-row w-full h-screen">
       {/* Sidebar */}
-      <div className="flex flex-col bg-white h-full md:w-[300px] border-r-[1px] dark:bg-darkBackground2">
+      <div className="flex flex-col bg-white h-full md:w-[330px] border-r-[1px] dark:bg-darkBackground2">
         <div className="flex w-full h-max items-center justify-between">
           <div className="p-4">
             <h1 className="text-2xl font-bold text-primary dark:text-primary">
@@ -142,6 +148,10 @@ const ChatScreen = () => {
           ))}
         </div>
 
+        <div className="flex w-full">
+          <Search />
+        </div>
+
         {/* Channel List */}
         <div className="flex-1 overflow-auto">
           {activeTab !== "unread"
@@ -152,13 +162,14 @@ const ChatScreen = () => {
 
       {/* Chat Container */}
       <div className="flex-grow hidden md:flex bg-white">
-        <ChatContainer
+        <Outlet />
+        {/* <ChatContainer
           isCreating={isCreating}
           setIsCreating={setIsCreating}
           isEditing={isEditing}
           setIsEditing={setIsEditing}
           createType={createType}
-        />
+        /> */}
       </div>
     </div>
   );
